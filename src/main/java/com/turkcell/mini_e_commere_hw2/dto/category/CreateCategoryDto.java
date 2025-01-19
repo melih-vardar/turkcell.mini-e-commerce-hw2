@@ -1,16 +1,18 @@
 package com.turkcell.mini_e_commere_hw2.dto.category;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.*;
-import org.hibernate.validator.constraints.Length;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class CreateCategoryDto {
-    @NotBlank(message = "Name cannot be empty")
-    @Length(min = 3, message = "Name must be at least 3 characters")
+    @NotBlank(message = "Category name cannot be empty")
+    @Size(min = 2, max = 50, message = "Category name must be between 2 and 50 characters")
     private String name;
 }

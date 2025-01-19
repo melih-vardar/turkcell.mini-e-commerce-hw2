@@ -1,9 +1,11 @@
 package com.turkcell.mini_e_commere_hw2.controller;
 
+import com.turkcell.mini_e_commere_hw2.dto.user.AuthUserDto;
 import com.turkcell.mini_e_commere_hw2.dto.user.LoginDto;
 import com.turkcell.mini_e_commere_hw2.dto.user.RegisterDto;
 import com.turkcell.mini_e_commere_hw2.entity.User;
 import com.turkcell.mini_e_commere_hw2.service.UserService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,14 +22,14 @@ public class UsersController {
         this.userService = userService;
     }
 
-  @PostMapping
-  public void add(@RequestBody RegisterDto registerDto)
+  @PostMapping("register")
+  public AuthUserDto add(@RequestBody @Valid RegisterDto registerDto)
   {
-    userService.add(registerDto);
+    return userService.add(registerDto);
   }
 
   @PostMapping("login")
-  public String login(@RequestBody LoginDto loginDto)
+  public AuthUserDto login(@RequestBody @Valid LoginDto loginDto)
   {
     return userService.login(loginDto);
   }

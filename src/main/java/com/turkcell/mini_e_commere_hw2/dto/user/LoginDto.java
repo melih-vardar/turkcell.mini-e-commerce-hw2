@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 public class LoginDto {
     @NotBlank(message = "Username cannot be empty")
-    @Email
+    @Email(message = "Invalid email format")
     private String username;
     
     @NotBlank(message = "Password cannot be empty")

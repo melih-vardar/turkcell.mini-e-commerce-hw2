@@ -37,7 +37,7 @@ public class ProductsController {
     }
 
     @PutMapping
-    public void update(@RequestBody UpdateProductDto updateProductDto) {
+    public void update(@RequestBody @Valid UpdateProductDto updateProductDto) {
         this.productService.update(updateProductDto);
     }
 }

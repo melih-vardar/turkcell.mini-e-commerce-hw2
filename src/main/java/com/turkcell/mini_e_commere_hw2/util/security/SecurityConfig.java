@@ -23,6 +23,18 @@ public class SecurityConfig {
             .httpBasic(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests((req) -> req
                     .requestMatchers("/api/v1/products").authenticated()
+                    .requestMatchers("/api/v1/users/register").permitAll()
+                    .requestMatchers("/api/v1/users/login").permitAll()
+                    .requestMatchers("/api/v1/carts/**").authenticated()
+                    .requestMatchers("/api/v1/orders/**").authenticated()
+                    .requestMatchers("/api/v1/categories/**").permitAll()
+                    .requestMatchers("/api/v1/sub-categories/**").permitAll()
+                    .requestMatchers("/api/v1/products/**").permitAll()
+                    .requestMatchers("/api/v1/users/**").permitAll()
+                    .requestMatchers("/v3/api-docs/**",
+                                   "/swagger-ui/**",
+                                   "/swagger-ui.html",
+                                   "/webjars/**").permitAll()
                     .anyRequest().permitAll()
             )
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

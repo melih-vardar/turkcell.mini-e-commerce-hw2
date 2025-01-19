@@ -17,3 +17,12 @@ server:
 jwt:
   expiration: 600000
   secret: "twCdrIdw0rlhQt1WiSAzplkYspw6QzW09CxMmdMfAzwLAliuHMtoQrp5Xb9xy71nNkc8NFFU82KTpEgw3FyfWihtuPlTLsaQ9tSMrOsANQ"
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
+    docExpansion: none

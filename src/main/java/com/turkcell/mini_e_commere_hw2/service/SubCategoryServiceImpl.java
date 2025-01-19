@@ -5,6 +5,7 @@ import com.turkcell.mini_e_commere_hw2.dto.subcategory.SubCategoryListingDto;
 import com.turkcell.mini_e_commere_hw2.dto.subcategory.UpdateSubCategoryDto;
 import com.turkcell.mini_e_commere_hw2.entity.Category;
 import com.turkcell.mini_e_commere_hw2.entity.SubCategory;
+import com.turkcell.mini_e_commere_hw2.repository.CategoryRepository;
 import com.turkcell.mini_e_commere_hw2.repository.SubCategoryRepository;
 import com.turkcell.mini_e_commere_hw2.rules.CategoryBusinessRules;
 import com.turkcell.mini_e_commere_hw2.util.exception.type.BusinessException;
@@ -16,12 +17,12 @@ import java.util.Optional;
 @Service
 public class SubCategoryServiceImpl implements SubCategoryService {
     private final SubCategoryRepository subCategoryRepository;
-    private final CategoryService categoryService;
+    private final CategoryRepository categoryRepository;
     private final CategoryBusinessRules categoryBusinessRules;
 
-    public SubCategoryServiceImpl(SubCategoryRepository subCategoryRepository, CategoryService categoryService, CategoryBusinessRules categoryBusinessRules) {
+    public SubCategoryServiceImpl(SubCategoryRepository subCategoryRepository, CategoryRepository categoryRepository, CategoryBusinessRules categoryBusinessRules) {
         this.subCategoryRepository = subCategoryRepository;
-        this.categoryService = categoryService;
+        this.categoryRepository = categoryRepository;
         this.categoryBusinessRules = categoryBusinessRules;
     }
 
@@ -29,7 +30,7 @@ public class SubCategoryServiceImpl implements SubCategoryService {
     public void add(CreateSubCategoryDto createSubCategoryDto) {
         categoryBusinessRules.categoryMustExist(createSubCategoryDto.getCategoryId());
 
-        Category category = categoryService
+        Category category = categoryRepository
                 .findById(createSubCategoryDto.getCategoryId())
                 .orElse(null);
 
@@ -51,7 +52,7 @@ public class SubCategoryServiceImpl implements SubCategoryService {
     public void update(UpdateSubCategoryDto updateSubCategoryDto) {
         categoryBusinessRules.categoryMustExist(updateSubCategoryDto.getCategoryId());
 
-        Category category = categoryService
+        Category category = categoryRepository
                 .findById(updateSubCategoryDto.getCategoryId())
                 .orElse(null);
 

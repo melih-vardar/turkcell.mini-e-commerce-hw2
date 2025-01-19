@@ -1,9 +1,11 @@
 package com.turkcell.mini_e_commere_hw2.service;
+import com.turkcell.mini_e_commere_hw2.dto.user.AuthUserDto;
 import com.turkcell.mini_e_commere_hw2.dto.user.LoginDto;
 import com.turkcell.mini_e_commere_hw2.dto.user.RegisterDto;
 import com.turkcell.mini_e_commere_hw2.entity.Cart;
 import com.turkcell.mini_e_commere_hw2.entity.User;
 import com.turkcell.mini_e_commere_hw2.repository.UserRepository;
+import com.turkcell.mini_e_commere_hw2.rules.UserBusinessRules;
 import com.turkcell.mini_e_commere_hw2.util.exception.type.BusinessException;
 import com.turkcell.mini_e_commere_hw2.util.jwt.JwtService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -15,17 +17,22 @@ import java.util.UUID;
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final UserBusinessRules userBusinessRules;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtService jwtService;
 
-    public UserServiceImpl(UserRepository userRepository, JwtService jwtService) {
+    public UserServiceImpl(UserRepository userRepository, UserBusinessRules userBusinessRules, JwtService jwtService) {
         this.userRepository = userRepository;
+        this.userBusinessRules = userBusinessRules;
         this.jwtService = jwtService;
         bCryptPasswordEncoder = new BCryptPasswordEncoder(); // TODO: Bean olarak ekle.
     }
 
     @Override
-    public void add(RegisterDto registerDto) {
+    public AuthUserDto add(RegisterDto registerDto) {
+        userBusinessRules.usernameMustNotExist(registerDto.getUsername());
+        userBusinessRules.passwordMustBeValid(registerDto.getPassword());
+
         User user = new User();
         user.setName(registerDto.getName());
         user.setSurname(registerDto.getSurname());
@@ -39,10 +46,15 @@ public class UserServiceImpl implements UserService {
         user.setCart(cart);
 
         userRepository.save(user);
+
+        AuthUserDto authUserDto = new AuthUserDto();
+        authUserDto.setToken(this.jwtService.generateToken(user.getUsername()));
+
+        return authUserDto;
     }
 
     @Override
-    public String login(LoginDto loginDto) {
+    public AuthUserDto login(LoginDto loginDto) {
         User dbUser = userRepository
                 .findByUsername(loginDto.getUsername())
                 .orElseThrow(() -> new BusinessException("Invalid or wrong credentials."));
@@ -53,7 +65,9 @@ public class UserServiceImpl implements UserService {
         if(!isPasswordCorrect)
             throw new BusinessException("Invalid or wrong credentials.");
 
-        return this.jwtService.generateToken(dbUser.getUsername());
+        AuthUserDto authUserDto = new AuthUserDto();
+        authUserDto.setToken(this.jwtService.generateToken(dbUser.getUsername()));
+        return authUserDto;
     }
 
     @Override
