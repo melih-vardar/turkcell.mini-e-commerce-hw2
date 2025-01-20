@@ -13,6 +13,7 @@ public interface ProductRepository extends JpaRepository<Product, Integer>
 {
   Optional<Product> findByName(String name);
   Optional<Product> findByNameIsAndIdIsNot(String name, Integer id);
+  boolean existsBySubCategoryId(Integer subCategoryId);
 
   @Query("SELECT p FROM Product p " +
          "WHERE (:categoryId IS NULL OR p.subCategory.category.id = :categoryId) " +

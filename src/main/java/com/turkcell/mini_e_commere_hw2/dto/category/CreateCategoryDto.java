@@ -13,6 +13,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class CreateCategoryDto {
     @NotBlank(message = "Category name cannot be empty")
-    @Size(min = 2, max = 50, message = "Category name must be between 2 and 50 characters")
+    @Size(min = 2, max = 100, message = "Category name must be between 2 and 100 characters")
     private String name;
 }

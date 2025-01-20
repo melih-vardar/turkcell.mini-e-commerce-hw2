@@ -12,4 +12,5 @@ public interface CategoryService {
     void delete(Integer id);
     List<CategoryListingDto> getAll();
     CategoryListingDto getById(Integer id);
+    void addSubCategory(Integer categoryId, Integer subCategoryId);
 }

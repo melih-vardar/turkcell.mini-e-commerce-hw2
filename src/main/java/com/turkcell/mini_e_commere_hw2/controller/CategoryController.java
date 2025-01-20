@@ -42,4 +42,7 @@ public class CategoryController {
     public CategoryListingDto getById(@PathVariable Integer id) {
         return categoryService.getById(id);
     }
+
+    @PutMapping("/addSubCategory")
+    public void addSubCategory(@RequestBody @Valid Integer categoryId, Integer subCategoryId) {}
 }

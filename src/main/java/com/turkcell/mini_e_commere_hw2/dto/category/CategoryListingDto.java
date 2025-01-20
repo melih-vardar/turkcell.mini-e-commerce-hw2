@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -13,4 +15,5 @@ public class CategoryListingDto {
     private Integer id;
     private String name;
     private int subCategoryCount;
+    private List<String> subCategoryName;
 }
