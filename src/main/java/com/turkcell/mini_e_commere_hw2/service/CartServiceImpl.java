@@ -149,4 +149,9 @@ public class CartServiceImpl implements CartService {
         
         cartRepository.save(cart);
     }
+
+    @Override
+    public void saveCard(Cart cart) { //Createorder işlemi sonrası kartın boş halini kaydetmek için
+        cartRepository.save(cart);
+    }
 }
