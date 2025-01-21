@@ -2,7 +2,7 @@ spring:
   application:
     name: mini-e-commere-hw2
   datasource:
-    url: jdbc:postgresql://localhost:5433/mini-ecommerce
+    url: jdbc:postgresql://localhost:5432/mini-ecommerce
     username: postgres
     password: test
   jpa:
