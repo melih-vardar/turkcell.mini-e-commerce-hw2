@@ -6,6 +6,7 @@ import com.turkcell.mini_e_commere_hw2.entity.Order;
 import com.turkcell.mini_e_commere_hw2.entity.OrderItem;
 import com.turkcell.mini_e_commere_hw2.entity.OrderStatus;
 import com.turkcell.mini_e_commere_hw2.entity.User;
+import com.turkcell.mini_e_commere_hw2.repository.OrderItemRepository;
 import com.turkcell.mini_e_commere_hw2.repository.OrderRepository;
 import com.turkcell.mini_e_commere_hw2.rules.OrderBusinessRules;
 import com.turkcell.mini_e_commere_hw2.util.exception.type.BusinessException;
@@ -25,33 +26,41 @@ public class OrderServiceImpl implements OrderService {
     private final UserService userService;
     private final CartService cartService;
 
-    public OrderServiceImpl(OrderRepository orderRepository, OrderBusinessRules orderBusinessRules, ProductService productService, CartService cartService,UserService userService) {
+    public OrderServiceImpl(OrderRepository orderRepository,
+                            OrderBusinessRules orderBusinessRules,
+                            ProductService productService,
+                            CartService cartService,
+                            UserService userService,
+                            OrderItemRepository orderItemRepository) {
         this.orderRepository = orderRepository;
         this.orderBusinessRules = orderBusinessRules;
         this.productService = productService;
         this.userService = userService;
         this.cartService = cartService;
-
     }
 
     @Override
     public void createOrder(UUID userId) {
         User user = userService.findById(userId);
+        orderBusinessRules.cartMustNotBeEmpty(user.getCart());
         orderBusinessRules.checkTheProductStockAfterUpdateProductStockForOrder(user.getCart(),productService);
+
         Order order = new Order();
-        order.setOrderItems(
-                user.getCart().getCartItems().stream().map(item ->{
-                    OrderItem orderItem = new OrderItem();
-                    orderItem.setId(item.getId());
-                    orderItem.setQuantity(item.getQuantity());
-                    orderItem.setPrice(item.getProduct().getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
-                    return orderItem;
-                }).collect(Collectors.toList())
-        );
-        order.setTotalPrice(user.getCart().getTotalPrice());
         order.setUser(user);
         order.setOrderDate(LocalDateTime.now());
         order.setStatus(OrderStatus.HAZIRLANIYOR);
+        order.setTotalPrice(user.getCart().getTotalPrice());
+
+
+        List<OrderItem> orderItems = user.getCart().getCartItems().stream().map(item ->{
+                    OrderItem orderItem = new OrderItem();
+                    orderItem.setQuantity(item.getQuantity());
+                    orderItem.setPrice(item.getProduct().getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
+                    orderItem.setOrder(order);
+                    return orderItem;
+                }).collect(Collectors.toList());
+
+        order.setOrderItems(orderItems);
 
         user.getCart().getCartItems().clear();  // sepetteki ürünleri sil
 

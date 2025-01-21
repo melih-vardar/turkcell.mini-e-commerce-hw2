@@ -64,7 +64,7 @@ public class CategoryServiceImpl implements CategoryService{
 
     for (SubCategory subCategory : subCategories) {
       if (productRepository.existsBySubCategoryId(subCategory.getId())) {
-        throw new RuntimeException("Category cannot be deleted because it has associated products through subcategories.");
+        throw new BusinessException("Category cannot be deleted because it has associated products through subcategories.");
       }
     }
 

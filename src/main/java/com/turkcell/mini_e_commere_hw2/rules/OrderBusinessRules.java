@@ -64,4 +64,11 @@ public class OrderBusinessRules {
         updateProductDto.setUnitPrice(productListingDto.getUnitPrice());
         return updateProductDto;
     }
+
+    // kullanicinin sepeti bos ise siparis olusturulamaz
+    public void cartMustNotBeEmpty(Cart cart){
+        if(cart.getCartItems() == null || cart.getCartItems().isEmpty()){
+            throw new BusinessException("Cart is empty. Cannot create order.");
+        }
+    }
 }
