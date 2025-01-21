@@ -8,7 +8,6 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class UpdateOrderDto {
     private Integer id;
     private List<OrderItemDto> orderItems;

@@ -11,6 +11,8 @@ import com.turkcell.mini_e_commere_hw2.repository.CartRepository;
 import com.turkcell.mini_e_commere_hw2.repository.ProductRepository;
 import com.turkcell.mini_e_commere_hw2.rules.CartBusinessRules;
 import com.turkcell.mini_e_commere_hw2.rules.ProductBusinessRules;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -18,27 +20,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class CartServiceImpl implements CartService {
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
-    private final ProductService productService;
     private final ProductRepository productRepository;
     private final ProductBusinessRules productBusinessRules;
     private final CartBusinessRules cartBusinessRules;
-
-    public CartServiceImpl(CartRepository cartRepository, 
-                         CartItemRepository cartItemRepository, 
-                         ProductService productService,
-                         ProductRepository productRepository,
-                         ProductBusinessRules productBusinessRules, 
-                         CartBusinessRules cartBusinessRules) {
-        this.cartRepository = cartRepository;
-        this.cartItemRepository = cartItemRepository;
-        this.productService = productService;
-        this.productRepository = productRepository;
-        this.productBusinessRules = productBusinessRules;
-        this.cartBusinessRules = cartBusinessRules;
-    }
 
     @Override
     public CartListingDto getById(Integer id) {
@@ -92,12 +80,12 @@ public class CartServiceImpl implements CartService {
 
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
-        int itemPrice = product.getUnitPrice().multiply(BigDecimal.valueOf(quantity)).intValue();
+        BigDecimal itemPrice = product.getUnitPrice().multiply(BigDecimal.valueOf(quantity));
 
         if (existingItem != null) {
             // Update existing cart item
             existingItem.setQuantity(existingItem.getQuantity() + quantity);
-            existingItem.setPrice(existingItem.getPrice() + itemPrice);
+            existingItem.setPrice(existingItem.getPrice().add(itemPrice));
         } else {
             // Create new cart item
             CartItem newCartItem = new CartItem();
@@ -109,9 +97,8 @@ public class CartServiceImpl implements CartService {
         }
 
         // Update cart total
-        cart.setTotalPrice(cart.getTotalPrice()
-                .add(product.getUnitPrice()
-                        .multiply(BigDecimal.valueOf(quantity))));
+        cart.setTotalPrice((cart).getTotalPrice()
+                .add(itemPrice));
         
         cartRepository.save(cart);
     }
@@ -136,10 +123,9 @@ public class CartServiceImpl implements CartService {
         } else {
             // Reduce the quantity
             cartItem.setQuantity(cartItem.getQuantity() - quantity);
-            int priceReduction = cartItem.getProduct().getUnitPrice()
-                    .multiply(BigDecimal.valueOf(quantity))
-                    .intValue();
-            cartItem.setPrice(cartItem.getPrice() - priceReduction);
+            BigDecimal priceReduction = cartItem.getProduct().getUnitPrice()
+                    .multiply(BigDecimal.valueOf(quantity));
+            cartItem.setPrice(cartItem.getPrice().subtract(priceReduction));
         }
         
         // Update cart total
@@ -151,7 +137,13 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public void saveCard(Cart cart) { //Createorder işlemi sonrası kartın boş halini kaydetmek için
+    public void resetCart(Integer cartId) {
+        Cart cart = cartRepository.findById(cartId)
+                .orElseThrow(() -> new RuntimeException("Cart not found"));
+
+        cart.getCartItems().clear();
+        cart.setTotalPrice(BigDecimal.ZERO);
+
         cartRepository.save(cart);
     }
 }

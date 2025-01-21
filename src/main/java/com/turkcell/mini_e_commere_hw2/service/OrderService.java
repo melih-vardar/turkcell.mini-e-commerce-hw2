@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public interface OrderService {
 
-    public void createOrder(UUID userId);
-    public void updateOrderState(Integer id);
-    public List<OrderListingDto> getAllUserOrders(UUID id);
+    OrderListingDto createOrder(UUID userId);
+    OrderListingDto updateOrderState(Integer id);
+    List<OrderListingDto> getAllUserOrders(UUID id);
 }

@@ -14,6 +14,9 @@ public interface ProductService {
 
     List<ProductListingDto> getAll();
 
-    List<ProductListingDto> search(String categoryId, BigDecimal minPrice, BigDecimal maxPrice, boolean inStock);
+    List<ProductListingDto> search(String categoryId, String subCategoryId, BigDecimal minPrice, BigDecimal maxPrice, Boolean inStock);
+
     ProductListingDto findById(Integer id);
+
+    void delete(Integer id);
 }

@@ -9,22 +9,18 @@ import com.turkcell.mini_e_commere_hw2.repository.CategoryRepository;
 import com.turkcell.mini_e_commere_hw2.repository.SubCategoryRepository;
 import com.turkcell.mini_e_commere_hw2.rules.CategoryBusinessRules;
 import com.turkcell.mini_e_commere_hw2.util.exception.type.BusinessException;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class SubCategoryServiceImpl implements SubCategoryService {
     private final SubCategoryRepository subCategoryRepository;
     private final CategoryRepository categoryRepository;
     private final CategoryBusinessRules categoryBusinessRules;
-
-    public SubCategoryServiceImpl(SubCategoryRepository subCategoryRepository, CategoryRepository categoryRepository, CategoryBusinessRules categoryBusinessRules) {
-        this.subCategoryRepository = subCategoryRepository;
-        this.categoryRepository = categoryRepository;
-        this.categoryBusinessRules = categoryBusinessRules;
-    }
 
     @Override
     public void add(CreateSubCategoryDto createSubCategoryDto) {

@@ -9,27 +9,21 @@ import com.turkcell.mini_e_commere_hw2.repository.ProductRepository;
 import com.turkcell.mini_e_commere_hw2.repository.SubCategoryRepository;
 import com.turkcell.mini_e_commere_hw2.rules.CategoryBusinessRules;
 import com.turkcell.mini_e_commere_hw2.util.exception.type.BusinessException;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class CategoryServiceImpl implements CategoryService{
   private final CategoryRepository categoryRepository;
   private final CategoryBusinessRules categoryBusinessRules;
   private final SubCategoryRepository subCategoryRepository;
   private final ProductRepository productRepository;
-
-  public CategoryServiceImpl(CategoryRepository categoryRepository, CategoryBusinessRules categoryBusinessRules, SubCategoryRepository subCategoryRepository, ProductRepository productRepository) {
-      this.categoryRepository = categoryRepository;
-      this.categoryBusinessRules = categoryBusinessRules;
-      this.subCategoryRepository = subCategoryRepository;
-      this.productRepository = productRepository;
-  }
 
   @Override
   public void add(CreateCategoryDto createCategoryDto) {
@@ -59,14 +53,7 @@ public class CategoryServiceImpl implements CategoryService{
   @Override
   public void delete(Integer id) {
     categoryBusinessRules.categoryMustExist(id);
-
-    List<SubCategory> subCategories = subCategoryRepository.findAllByCategoryId(id);
-
-    for (SubCategory subCategory : subCategories) {
-      if (productRepository.existsBySubCategoryId(subCategory.getId())) {
-        throw new BusinessException("Category cannot be deleted because it has associated products through subcategories.");
-      }
-    }
+    categoryBusinessRules.categoryMustNotHaveAssociatedProducts(id);
 
     Category categoryToUpdate = categoryRepository.findById(id)
             .orElseThrow(() -> new BusinessException("Category not found"));

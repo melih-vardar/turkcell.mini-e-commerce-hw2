@@ -8,25 +8,20 @@ import com.turkcell.mini_e_commere_hw2.repository.UserRepository;
 import com.turkcell.mini_e_commere_hw2.rules.UserBusinessRules;
 import com.turkcell.mini_e_commere_hw2.util.exception.type.BusinessException;
 import com.turkcell.mini_e_commere_hw2.util.jwt.JwtService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import lombok.AllArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
 @Service
+@AllArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserBusinessRules userBusinessRules;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtService jwtService;
-
-    public UserServiceImpl(UserRepository userRepository, UserBusinessRules userBusinessRules, JwtService jwtService) {
-        this.userRepository = userRepository;
-        this.userBusinessRules = userBusinessRules;
-        this.jwtService = jwtService;
-        bCryptPasswordEncoder = new BCryptPasswordEncoder(); // TODO: Bean olarak ekle.
-    }
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public AuthUserDto add(RegisterDto registerDto) {
@@ -37,7 +32,7 @@ public class UserServiceImpl implements UserService {
         user.setName(registerDto.getName());
         user.setSurname(registerDto.getSurname());
         user.setUsername(registerDto.getUsername());
-        user.setPassword(bCryptPasswordEncoder.encode(registerDto.getPassword()));
+        user.setPassword(passwordEncoder.encode(registerDto.getPassword()));
 
         // Create and associate cart
         Cart cart = new Cart();
@@ -59,7 +54,7 @@ public class UserServiceImpl implements UserService {
                 .findByUsername(loginDto.getUsername())
                 .orElseThrow(() -> new BusinessException("Invalid or wrong credentials."));
 
-        boolean isPasswordCorrect = bCryptPasswordEncoder
+        boolean isPasswordCorrect = passwordEncoder
                 .matches(loginDto.getPassword(), dbUser.getPassword());
 
         if(!isPasswordCorrect)

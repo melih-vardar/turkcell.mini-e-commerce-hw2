@@ -9,7 +9,6 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class CreateCartDto {
     @NotNull(message = "User ID cannot be null")
     private UUID userId;

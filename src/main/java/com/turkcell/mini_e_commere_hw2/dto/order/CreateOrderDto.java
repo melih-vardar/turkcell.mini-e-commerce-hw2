@@ -10,7 +10,6 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class CreateOrderDto {
     @NotNull(message = "User ID cannot be null")
     private UUID userId;

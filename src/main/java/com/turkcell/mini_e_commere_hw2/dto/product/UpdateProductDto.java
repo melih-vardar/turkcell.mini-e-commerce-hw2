@@ -8,6 +8,8 @@ import org.hibernate.validator.constraints.Length;
 
 import java.math.BigDecimal;
 
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class UpdateProductDto {
@@ -32,62 +34,6 @@ public class UpdateProductDto {
 
     @Length(max = 255, message = "Image URL must be at most 255 characters")
     private String image;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public BigDecimal getUnitPrice() {
-        return unitPrice;
-    }
-
-    public void setUnitPrice(BigDecimal unitPrice) {
-        this.unitPrice = unitPrice;
-    }
-
-    public int getStock() {
-        return stock;
-    }
-
-    public void setStock(int stock) {
-        this.stock = stock;
-    }
-
-    public Integer getSubCategoryId() {
-        return subCategoryId;
-    }
-
-    public void setSubCategoryId(Integer subCategoryId) {
-        this.subCategoryId = subCategoryId;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
 }
 
 

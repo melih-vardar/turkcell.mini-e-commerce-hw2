@@ -20,15 +20,15 @@ public class OrderController {
     }
 
     @PostMapping("/userId/{userId}")
-    public ResponseEntity<String> createOrder(@PathVariable UUID userId) {
-        orderService.createOrder(userId);
-        return ResponseEntity.ok("order created successfully");
+    public ResponseEntity<OrderListingDto> createOrder(@PathVariable UUID userId) {
+        return ResponseEntity.ok(orderService.createOrder(userId));
     }
+
     @PutMapping("/orderId/{orderId}/status")
-    public ResponseEntity<String> updateOrderState(@PathVariable Integer orderId) {
-        orderService.updateOrderState(orderId);
-        return ResponseEntity.ok("order status updated successfully");
+    public ResponseEntity<OrderListingDto> updateOrderState(@PathVariable Integer orderId) {
+        return ResponseEntity.ok(orderService.updateOrderState(orderId));
     }
+
     @GetMapping("userId/{userId}")
     public ResponseEntity<List<OrderListingDto>> getAllUserOrders(@PathVariable UUID userId) {
         List<OrderListingDto> orders = orderService.getAllUserOrders(userId);

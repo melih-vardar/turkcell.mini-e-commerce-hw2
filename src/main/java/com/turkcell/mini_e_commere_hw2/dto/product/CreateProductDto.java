@@ -8,9 +8,10 @@ import org.hibernate.validator.constraints.Length;
 
 import java.math.BigDecimal;
 
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class CreateProductDto {
     @NotBlank(message = "Name cannot be empty")
     @Length(min = 3, max = 50, message = "Name must be at least 3 characters and at most 50 characters")
@@ -30,52 +31,4 @@ public class CreateProductDto {
 
     @Length(max = 255, message = "Image URL must be at most 255 characters")
     private String image;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public BigDecimal getUnitPrice() {
-        return unitPrice;
-    }
-
-    public void setUnitPrice(BigDecimal unitPrice) {
-        this.unitPrice = unitPrice;
-    }
-
-    public int getStock() {
-        return stock;
-    }
-
-    public void setStock(int stock) {
-        this.stock = stock;
-    }
-
-    public Integer getSubCategoryId() {
-        return subCategoryId;
-    }
-
-    public void setSubCategoryId(Integer subCategoryId) {
-        this.subCategoryId = subCategoryId;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
 }

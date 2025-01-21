@@ -8,22 +8,19 @@ import com.turkcell.mini_e_commere_hw2.entity.SubCategory;
 import com.turkcell.mini_e_commere_hw2.repository.ProductRepository;
 import com.turkcell.mini_e_commere_hw2.rules.SubCategoryBusinessRules;
 import com.turkcell.mini_e_commere_hw2.util.exception.type.BusinessException;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final SubCategoryService subCategoryService;
     private final SubCategoryBusinessRules subCategoryBusinessRules;
 
-    public ProductServiceImpl(ProductRepository productRepository, SubCategoryService subCategoryService, SubCategoryBusinessRules subCategoryBusinessRules) {
-        this.productRepository = productRepository;
-        this.subCategoryService = subCategoryService;
-        this.subCategoryBusinessRules = subCategoryBusinessRules;
-    }
 
     @Override
     public void add(CreateProductDto createProductDto) {
@@ -55,6 +52,7 @@ public class ProductServiceImpl implements ProductService {
     public void update(UpdateProductDto updateProductDto) {
         subCategoryBusinessRules.subCategoryMustExist(updateProductDto.getSubCategoryId());
 
+
         SubCategory subCategory = subCategoryService
                 .findById(updateProductDto.getSubCategoryId())
                 .orElse(null);
@@ -81,11 +79,12 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductListingDto> getAll() {
-        List<ProductListingDto> productListingDtos = productRepository
+
+        return productRepository
                 .findAll()
                 .stream()
                 .map((product) -> {
-                    ProductListingDto productListingDto = new ProductListingDto(
+                    return new ProductListingDto(
                             product.getId(),
                             product.getName(),
                             product.getUnitPrice(),
@@ -97,20 +96,15 @@ public class ProductServiceImpl implements ProductService {
                             product.getDescription(),
                             product.getImage()
                     );
-                    return productListingDto;
                 })
                 .toList();
-
-        return productListingDtos;
     }
 
     @Override
-    public List<ProductListingDto> search(String categoryId, BigDecimal minPrice, BigDecimal maxPrice, boolean inStock) {
-        Integer categoryIdInt = categoryId != null && !categoryId.isEmpty() ? Integer.parseInt(categoryId) : null;
+    public List<ProductListingDto> search(String categoryId, String subCategoryId, BigDecimal minPrice, BigDecimal maxPrice, Boolean inStock) {
+        List<Product> products = productRepository.search(categoryId, subCategoryId, minPrice, maxPrice, inStock);
 
-        List<Product> products = productRepository.search(categoryIdInt, minPrice, maxPrice, inStock);
-
-        List<ProductListingDto> productListingDtos = products.stream()
+        return products.stream()
                 .map(product -> new ProductListingDto(
                                 product.getId(),
                                 product.getName(),
@@ -125,8 +119,6 @@ public class ProductServiceImpl implements ProductService {
                         )
                 )
                 .toList();
-
-        return productListingDtos;
     }
 
     @Override
@@ -134,7 +126,7 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new BusinessException("Product not found"));
 
-        ProductListingDto productListingDto = new ProductListingDto(
+        return new ProductListingDto(
                 product.getId(),
                 product.getName(),
                 product.getUnitPrice(),
@@ -146,7 +138,13 @@ public class ProductServiceImpl implements ProductService {
                 product.getDescription(),
                 product.getImage()
         );
+    }
 
-        return productListingDto;
+    @Override
+    public void delete(Integer id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new BusinessException("Product not found"));
+
+        productRepository.delete(product);
     }
 }

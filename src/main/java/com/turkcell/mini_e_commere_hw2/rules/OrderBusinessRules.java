@@ -5,7 +5,7 @@ import com.turkcell.mini_e_commere_hw2.dto.product.UpdateProductDto;
 import com.turkcell.mini_e_commere_hw2.entity.Cart;
 import com.turkcell.mini_e_commere_hw2.entity.CartItem;
 import com.turkcell.mini_e_commere_hw2.entity.Order;
-import com.turkcell.mini_e_commere_hw2.entity.OrderStatus;
+import com.turkcell.mini_e_commere_hw2.enums.OrderStatus;
 import com.turkcell.mini_e_commere_hw2.repository.OrderRepository;
 import com.turkcell.mini_e_commere_hw2.service.ProductService;
 import com.turkcell.mini_e_commere_hw2.util.exception.type.BusinessException;
@@ -38,19 +38,13 @@ public class OrderBusinessRules {
         }
     }
 
-    public void handleOrderStatusTransition(OrderStatus currentStatus, Order order){
 
-        if (currentStatus == OrderStatus.HAZIRLANIYOR) {
-            order.setStatus(OrderStatus.KARGODA);
-        } else if (currentStatus == OrderStatus.KARGODA) {
-            order.setStatus(OrderStatus.TESLIM_EDILDI);
-        } else if (currentStatus == OrderStatus.TESLIM_EDILDI) {
-            throw new BusinessException("Order already delivered. No further status updates allowed.");
-        } else {
-            throw new BusinessException("Invalid order status transition.");
+    // kullanicinin sepeti bos ise siparis olusturulamaz
+    public void cartMustNotBeEmpty(Cart cart){
+        if(cart.getCartItems() == null || cart.getCartItems().isEmpty()){
+            throw new BusinessException("Cart is empty. Cannot create order.");
         }
     }
-
     //map sınıfı olursa yaz
     private UpdateProductDto convertToUpdateProductDto(ProductListingDto productListingDto){
 
@@ -63,12 +57,5 @@ public class OrderBusinessRules {
         updateProductDto.setImage(productListingDto.getImage());
         updateProductDto.setUnitPrice(productListingDto.getUnitPrice());
         return updateProductDto;
-    }
-
-    // kullanicinin sepeti bos ise siparis olusturulamaz
-    public void cartMustNotBeEmpty(Cart cart){
-        if(cart.getCartItems() == null || cart.getCartItems().isEmpty()){
-            throw new BusinessException("Cart is empty. Cannot create order.");
-        }
     }
 }

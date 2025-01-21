@@ -8,17 +8,11 @@ import java.util.UUID;
 
 @Getter
 @Setter
-@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class CartListingDto {
     private Integer id;
     private UUID userId;
     private List<CartItemDto> cartItems;
     private BigDecimal totalPrice;
-
-    public CartListingDto(Integer id, UUID userId, List<CartItemDto> cartItems, BigDecimal totalPrice) {
-        this.id = id;
-        this.userId = userId;
-        this.cartItems = cartItems;
-        this.totalPrice = totalPrice;
-    }
 }

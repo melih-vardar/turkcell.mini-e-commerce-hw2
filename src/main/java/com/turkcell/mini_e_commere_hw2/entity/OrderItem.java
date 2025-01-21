@@ -1,5 +1,6 @@
 package com.turkcell.mini_e_commere_hw2.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,12 +21,13 @@ public class OrderItem {
     @Column(name="id")
     private Integer id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "product_id")
     private Product product;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
+    @JsonIgnore
     private Order order;
 
     @Column(name = "quantity")
@@ -33,4 +35,6 @@ public class OrderItem {
 
     @Column(name = "price")
     private BigDecimal price;
+
+
 }

@@ -17,13 +17,15 @@ public interface ProductRepository extends JpaRepository<Product, Integer>
 
   @Query("SELECT p FROM Product p " +
          "WHERE (:categoryId IS NULL OR p.subCategory.category.id = :categoryId) " +
+         "AND (:subCategoryId IS NULL OR p.subCategory.id = :subCategoryId) " +
          "AND (:minPrice IS NULL OR p.unitPrice >= :minPrice) " +
          "AND (:maxPrice IS NULL OR p.unitPrice <= :maxPrice) " +
-         "AND (:inStock = false OR p.stock > 0)")
+         "AND (:inStock IS NULL OR (:inStock = true AND p.stock > 0) OR (:inStock = false AND p.stock = 0))")
   List<Product> search(
-          @Param("categoryId") Integer categoryId,
+          @Param("categoryId") String categoryId,
+          @Param("subCategoryId") String subCategoryId,
           @Param("minPrice") BigDecimal minPrice,
           @Param("maxPrice") BigDecimal maxPrice,
-          @Param("inStock") boolean inStock
+          @Param("inStock") Boolean inStock
   );
 }
