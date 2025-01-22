@@ -3,7 +3,7 @@ package com.turkcell.mini_e_commere_hw2.controller;
 import com.turkcell.mini_e_commere_hw2.dto.product.CreateProductDto;
 import com.turkcell.mini_e_commere_hw2.dto.product.ProductListingDto;
 import com.turkcell.mini_e_commere_hw2.dto.product.UpdateProductDto;
-import com.turkcell.mini_e_commere_hw2.service.ProductService;
+import com.turkcell.mini_e_commere_hw2.service.application.ProductApplicationService;
 import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -15,21 +15,18 @@ import java.util.List;
 
 @RestController()
 @RequestMapping("/api/v1/products")
+@AllArgsConstructor
 public class ProductsController {
-    private final ProductService productService;
-
-    public ProductsController(ProductService productService) {
-        this.productService = productService;
-    }
+    private final ProductApplicationService productApplicationService;
 
     @PostMapping
     public void add(@RequestBody @Valid CreateProductDto createProductDto) {
-        this.productService.add(createProductDto);
+        this.productApplicationService.add(createProductDto);
     }
 
     @GetMapping
     public List<ProductListingDto> getAll() {
-        return this.productService.getAll();
+        return this.productApplicationService.getAll();
     }
 
     @GetMapping("/search")
@@ -38,16 +35,16 @@ public class ProductsController {
                                           @RequestParam @Nullable BigDecimal minPrice,
                                           @RequestParam @Nullable BigDecimal maxPrice,
                                           @RequestParam @Nullable Boolean inStock) {
-        return this.productService.search(categoryId, subCategoryId, minPrice, maxPrice, inStock);
+        return this.productApplicationService.search(categoryId, subCategoryId, minPrice, maxPrice, inStock);
     }
 
     @PutMapping
     public void update(@RequestBody @Valid UpdateProductDto updateProductDto) {
-        this.productService.update(updateProductDto);
+        this.productApplicationService.update(updateProductDto);
     }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Integer id) {
-        this.productService.delete(id);
+        this.productApplicationService.delete(id);
     }
 }

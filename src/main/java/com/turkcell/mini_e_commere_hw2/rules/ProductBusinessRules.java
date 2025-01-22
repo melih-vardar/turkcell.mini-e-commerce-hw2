@@ -6,19 +6,15 @@ import com.turkcell.mini_e_commere_hw2.repository.CartRepository;
 import com.turkcell.mini_e_commere_hw2.repository.OrderRepository;
 import com.turkcell.mini_e_commere_hw2.repository.ProductRepository;
 import com.turkcell.mini_e_commere_hw2.util.exception.type.BusinessException;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@AllArgsConstructor
 public class ProductBusinessRules {
     private final ProductRepository productRepository;
     private final CartRepository cartRepository;
     private final OrderRepository orderRepository;
-
-    public ProductBusinessRules(ProductRepository productRepository, CartRepository cartRepository, OrderRepository orderRepository) {
-        this.productRepository = productRepository;
-        this.cartRepository = cartRepository;
-        this.orderRepository = orderRepository;
-    }
 
     public void productIdMustExist(int productId) {
         productRepository.findById(productId).orElseThrow(() -> new BusinessException("Product not found"));

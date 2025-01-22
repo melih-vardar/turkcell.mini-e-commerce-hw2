@@ -50,7 +50,7 @@ public class SubCategoryApplicationServiceImpl implements SubCategoryApplication
 
     @Override
     public Optional<SubCategory> findById(Integer id) {
-        return subCategoryService.findById(id);
+        return subCategoryService.getById(id);
     }
 
 }

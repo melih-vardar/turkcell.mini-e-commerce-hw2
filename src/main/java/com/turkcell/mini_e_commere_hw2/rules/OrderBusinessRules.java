@@ -1,61 +1,42 @@
 package com.turkcell.mini_e_commere_hw2.rules;
 
-import com.turkcell.mini_e_commere_hw2.dto.product.ProductListingDto;
-import com.turkcell.mini_e_commere_hw2.dto.product.UpdateProductDto;
 import com.turkcell.mini_e_commere_hw2.entity.Cart;
 import com.turkcell.mini_e_commere_hw2.entity.CartItem;
-import com.turkcell.mini_e_commere_hw2.entity.Order;
-import com.turkcell.mini_e_commere_hw2.enums.OrderStatus;
+import com.turkcell.mini_e_commere_hw2.entity.Product;
 import com.turkcell.mini_e_commere_hw2.repository.OrderRepository;
-import com.turkcell.mini_e_commere_hw2.service.ProductService;
+import com.turkcell.mini_e_commere_hw2.repository.ProductRepository;
 import com.turkcell.mini_e_commere_hw2.util.exception.type.BusinessException;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
+@AllArgsConstructor
 public class OrderBusinessRules {
+    private final ProductRepository productRepository;
 
-
-    private final OrderRepository orderRepository;
-
-    public OrderBusinessRules( OrderRepository orderRepository) {
-        this.orderRepository = orderRepository;
-    }
-
-    public void checkTheProductStockAfterUpdateProductStockForOrder(Cart cart, ProductService productService){
-
+    public void checkTheProductStockAfterUpdateProductStockForOrder(Cart cart){
         for (CartItem cartItem : cart.getCartItems()){
-            ProductListingDto productListingDto = productService.findById(cartItem.getProduct().getId());
+            Optional<Product> product = productRepository.findById(cartItem.getProduct().getId());
 
-            if(productListingDto.getStock() < cartItem.getQuantity()){
-                throw new BusinessException("Insufficient stock for product: " + productListingDto.getName() +
-                        ". Available stock: " + productListingDto.getStock() + ", Required: " + cartItem.getQuantity());
+            if(product.isEmpty()){
+                throw new BusinessException("Product not found with id: " + cartItem.getProduct().getId());
             }
 
-            productListingDto.setStock(productListingDto.getStock()-cartItem.getQuantity());
-            UpdateProductDto updateProductDto = convertToUpdateProductDto(productListingDto);
-            productService.update(updateProductDto);
+            if(product.get().getStock() < cartItem.getQuantity()){
+                throw new BusinessException("Insufficient stock for product: " + product.get().getName() +
+                        ". Available stock: " + product.get().getStock() + ", Required: " + cartItem.getQuantity());
+            }
 
+            product.get().setStock(product.get().getStock()-cartItem.getQuantity());
+            productRepository.save(product.get());
         }
     }
-
-
     // kullanicinin sepeti bos ise siparis olusturulamaz
     public void cartMustNotBeEmpty(Cart cart){
         if(cart.getCartItems() == null || cart.getCartItems().isEmpty()){
             throw new BusinessException("Cart is empty. Cannot create order.");
         }
-    }
-    //map sınıfı olursa yaz
-    private UpdateProductDto convertToUpdateProductDto(ProductListingDto productListingDto){
-
-        UpdateProductDto updateProductDto = new UpdateProductDto();
-        updateProductDto.setId(productListingDto.getId());
-        updateProductDto.setName(productListingDto.getName());
-        updateProductDto.setSubCategoryId(productListingDto.getSubCategoryId());
-        updateProductDto.setStock(productListingDto.getStock());
-        updateProductDto.setDescription(productListingDto.getDescription());
-        updateProductDto.setImage(productListingDto.getImage());
-        updateProductDto.setUnitPrice(productListingDto.getUnitPrice());
-        return updateProductDto;
     }
 }

@@ -1,4 +1,4 @@
-package com.turkcell.mini_e_commere_hw2.util.exception.result;
+package com.turkcell.mini_e_commere_hw2.dto.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,6 +9,6 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ExceptionResult {
-  private String type;
+public class OperationClaimDto {
+    private String name;
 }

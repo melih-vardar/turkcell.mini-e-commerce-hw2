@@ -1,64 +1,37 @@
-package com.turkcell.mini_e_commere_hw2.service;
+package com.turkcell.mini_e_commere_hw2.service.domain;
 
-import com.turkcell.mini_e_commere_hw2.dto.cart.CartItemDto;
-import com.turkcell.mini_e_commere_hw2.dto.cart.CartListingDto;
-import com.turkcell.mini_e_commere_hw2.dto.cart.UpdateCartDto;
 import com.turkcell.mini_e_commere_hw2.entity.Cart;
 import com.turkcell.mini_e_commere_hw2.entity.CartItem;
 import com.turkcell.mini_e_commere_hw2.entity.Product;
-import com.turkcell.mini_e_commere_hw2.repository.CartItemRepository;
 import com.turkcell.mini_e_commere_hw2.repository.CartRepository;
-import com.turkcell.mini_e_commere_hw2.repository.ProductRepository;
 import com.turkcell.mini_e_commere_hw2.rules.CartBusinessRules;
 import com.turkcell.mini_e_commere_hw2.rules.ProductBusinessRules;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @AllArgsConstructor
 public class CartServiceImpl implements CartService {
     private final CartRepository cartRepository;
-    private final CartItemRepository cartItemRepository;
-    private final ProductRepository productRepository;
+
+    private final CartItemService cartItemService;
+    private final ProductService productService;
+
     private final ProductBusinessRules productBusinessRules;
     private final CartBusinessRules cartBusinessRules;
 
     @Override
-    public CartListingDto getById(Integer id) {
-        Cart cart = cartRepository.findById(id)
+    public Cart getById(Integer id) {
+        return cartRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Cart not found"));
-        List<CartItem> cartItems = cart.getCartItems();
-        List<CartItemDto> cartItemDtos = new ArrayList<>();
-
-        for (CartItem cartItem : cartItems) {
-            cartItemDtos.add(new CartItemDto(cartItem.getId(), cartItem.getProduct().getId(), cartItem.getQuantity(), cartItem.getPrice()));
-        }
-
-        return new CartListingDto(cart.getId(), cart.getUser().getId(), cartItemDtos, cart.getTotalPrice());
     }
 
     @Override
-    public List<CartListingDto> getAll() {
-        List<Cart> carts = cartRepository.findAll();
-        List<CartListingDto> cartListingDtos = new ArrayList<>();
-
-        for (Cart cart : carts) {
-            List<CartItem> cartItems = cart.getCartItems();
-            List<CartItemDto> cartItemDtos = new ArrayList<>();
-
-            for (CartItem cartItem : cartItems) {
-                cartItemDtos.add(new CartItemDto(cartItem.getId(), cartItem.getProduct().getId(), cartItem.getQuantity(), cartItem.getPrice()));
-            }
-
-            cartListingDtos.add(new CartListingDto(cart.getId(), cart.getUser().getId(), cartItemDtos, cart.getTotalPrice()));
-        }
-
-        return cartListingDtos;
+    public List<Cart> getAll() {
+        return cartRepository.findAll();
     }
 
     @Override
@@ -78,8 +51,7 @@ public class CartServiceImpl implements CartService {
                 .findFirst()
                 .orElse(null);
 
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+        Product product = productService.getById(productId);
         BigDecimal itemPrice = product.getUnitPrice().multiply(BigDecimal.valueOf(quantity));
 
         if (existingItem != null) {
@@ -111,15 +83,14 @@ public class CartServiceImpl implements CartService {
         Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new RuntimeException("Cart not found"));
         
-        CartItem cartItem = cartItemRepository.findById(cartItemId)
-                .orElseThrow(() -> new RuntimeException("Cart item not found"));
+        CartItem cartItem = cartItemService.getById(cartItemId);
         
         productBusinessRules.productIdMustExist(cartItem.getProduct().getId());
 
         if (cartItem.getQuantity() <= quantity) {
             // Remove the entire cart item
             cart.getCartItems().remove(cartItem);
-            cartItemRepository.delete(cartItem);
+            cartItemService.delete(cartItem.getId());
         } else {
             // Reduce the quantity
             cartItem.setQuantity(cartItem.getQuantity() - quantity);
@@ -145,5 +116,10 @@ public class CartServiceImpl implements CartService {
         cart.setTotalPrice(BigDecimal.ZERO);
 
         cartRepository.save(cart);
+    }
+
+    @Override
+    public boolean existsById(Integer id) {
+        return cartRepository.existsById(id);
     }
 }

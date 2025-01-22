@@ -1,36 +1,26 @@
 package com.turkcell.mini_e_commere_hw2.controller;
 
-import com.turkcell.mini_e_commere_hw2.dto.user.AuthUserDto;
-import com.turkcell.mini_e_commere_hw2.dto.user.LoginDto;
-import com.turkcell.mini_e_commere_hw2.dto.user.RegisterDto;
-import com.turkcell.mini_e_commere_hw2.entity.User;
-import com.turkcell.mini_e_commere_hw2.service.UserService;
-import jakarta.validation.Valid;
+import com.turkcell.mini_e_commere_hw2.dto.user.UserListingDto;
+import com.turkcell.mini_e_commere_hw2.service.application.UserApplicationService;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/users")
+@AllArgsConstructor
 public class UsersController {
-  private final UserService userService;
+    private final UserApplicationService userApplicationService;
 
-    public UsersController(UserService userService)
-    {
-        this.userService = userService;
+    @GetMapping
+    public List<UserListingDto> getAll() {
+        return this.userApplicationService.getAll();
     }
 
-  @PostMapping("register")
-  public AuthUserDto add(@RequestBody @Valid RegisterDto registerDto)
-  {
-    return userService.add(registerDto);
-  }
-
-  @PostMapping("login")
-  public AuthUserDto login(@RequestBody @Valid LoginDto loginDto)
-  {
-    return userService.login(loginDto);
-  }
+    @GetMapping("/{id}")
+    public UserListingDto getById(@PathVariable UUID id) {
+        return this.userApplicationService.getById(id);
+    }
 }

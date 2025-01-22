@@ -69,7 +69,7 @@ public class SubCategoryServiceImpl implements SubCategoryService {
     }
 
     @Override
-    public Optional<SubCategory> findById(Integer id) {
+    public Optional<SubCategory> getById(Integer id) {
         return subCategoryRepository.findById(id);
     }
 } 

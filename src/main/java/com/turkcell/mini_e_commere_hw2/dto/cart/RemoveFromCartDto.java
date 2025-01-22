@@ -11,11 +11,10 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AddToCartDto {
+public class RemoveFromCartDto {
     @NotNull(message = "Product ID cannot be null")
-    private Integer productId;
+    private Integer cartItemId ;
     @NotNull(message = "Quantity cannot be null")
     @Min(value = 1, message = "Quantity must be greater than 0")
     private Integer quantity;
 }
-

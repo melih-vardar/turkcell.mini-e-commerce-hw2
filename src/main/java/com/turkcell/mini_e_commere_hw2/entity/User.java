@@ -13,6 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @Setter
+@Inheritance(strategy = InheritanceType.JOINED)
 public class User {
     @Id
     @UuidGenerator
@@ -36,4 +37,12 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Order> orders;
+
+    @ManyToMany()
+    @JoinTable(
+            name="user_operation_claims",
+            joinColumns = @JoinColumn(name="user_id"),
+            inverseJoinColumns = @JoinColumn(name="operation_claim_id")
+    )
+    private List<OperationClaim> operationClaims;
 }

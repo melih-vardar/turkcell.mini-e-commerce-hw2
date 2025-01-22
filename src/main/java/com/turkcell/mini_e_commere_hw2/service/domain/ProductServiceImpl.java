@@ -1,10 +1,8 @@
 package com.turkcell.mini_e_commere_hw2.service.domain;
 
 import com.turkcell.mini_e_commere_hw2.entity.Product;
-import com.turkcell.mini_e_commere_hw2.entity.SubCategory;
 import com.turkcell.mini_e_commere_hw2.repository.ProductRepository;
 import com.turkcell.mini_e_commere_hw2.rules.SubCategoryBusinessRules;
-import com.turkcell.mini_e_commere_hw2.service.SubCategoryService;
 import com.turkcell.mini_e_commere_hw2.util.exception.type.BusinessException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,16 +14,11 @@ import java.util.List;
 @AllArgsConstructor
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
-    private final SubCategoryService subCategoryService;
     private final SubCategoryBusinessRules subCategoryBusinessRules;
-
 
     @Override
     public void add(Product product) {
         subCategoryBusinessRules.subCategoryMustExist(product.getSubCategory().getId());
-
-        SubCategory subCategory = subCategoryService.findById(product.getSubCategory().getId());
-
         Product productWithSameName = productRepository
                 .findByName(product.getName())
                 .orElse(null);
@@ -39,11 +32,6 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void update(Product product) {
         subCategoryBusinessRules.subCategoryMustExist(product.getSubCategory().getId());
-
-
-        SubCategory subCategory = subCategoryService
-                .findById(product.getSubCategory().getId())
-                .orElse(null);
 
         Product productWithSameName = productRepository
                 .findByNameIsAndIdIsNot(product.getName(), product.getId())
@@ -60,7 +48,6 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<Product> getAll() {
-
         return productRepository.findAll();
     }
 
@@ -70,8 +57,14 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Product findById(Integer id) {
+    public Product getById(Integer id) {
         return productRepository.findById(id)
+                .orElseThrow(() -> new BusinessException("Product not found"));
+    }
+
+    @Override
+    public Product getByName(String name) {
+        return productRepository.findByName(name)
                 .orElseThrow(() -> new BusinessException("Product not found"));
     }
 

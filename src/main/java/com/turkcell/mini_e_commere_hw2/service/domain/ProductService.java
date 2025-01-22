@@ -7,7 +7,8 @@ import java.util.List;
 
 public interface ProductService {
     void delete(Integer id);
-    Product findById(Integer id);
+    Product getById(Integer id);
+    Product getByName(String name);
     List<Product> getAll();
     List<Product> search(String categoryId, String subCategoryId, BigDecimal minPrice, BigDecimal maxPrice, Boolean inStock);
     void add(Product product);

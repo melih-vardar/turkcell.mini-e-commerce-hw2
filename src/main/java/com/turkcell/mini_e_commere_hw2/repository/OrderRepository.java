@@ -15,4 +15,5 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     boolean existsByProductId(@Param("productId") Integer productId);
 
     List<Order> findByUserIdOrderByOrderDateDesc(UUID userId);
+
 }

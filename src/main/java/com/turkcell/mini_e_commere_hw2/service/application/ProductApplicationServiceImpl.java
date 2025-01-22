@@ -54,7 +54,12 @@ public class ProductApplicationServiceImpl implements ProductApplicationService 
 
     @Override
     public ProductListingDto findById(Integer id) {
-        Product product = productService.findById(id);
+        Product product = productService.getById(id);
         return modelMapper.map(product, ProductListingDto.class);
+    }
+
+    @Override
+    public void delete(Integer id) {
+        productService.delete(id);
     }
 }

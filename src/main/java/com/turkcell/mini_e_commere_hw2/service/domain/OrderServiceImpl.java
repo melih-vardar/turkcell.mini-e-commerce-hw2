@@ -5,8 +5,6 @@ import com.turkcell.mini_e_commere_hw2.enums.OrderStatus;
 import com.turkcell.mini_e_commere_hw2.entity.User;
 import com.turkcell.mini_e_commere_hw2.repository.OrderRepository;
 import com.turkcell.mini_e_commere_hw2.rules.OrderBusinessRules;
-import com.turkcell.mini_e_commere_hw2.service.CartService;
-import com.turkcell.mini_e_commere_hw2.service.UserService;
 import com.turkcell.mini_e_commere_hw2.util.exception.type.BusinessException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,7 +25,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order createOrder(UUID userId) {
-        User user = userService.findById(userId);
+        User user = userService.getById(userId);
         orderBusinessRules.cartMustNotBeEmpty(user.getCart());
         orderBusinessRules.
                 checkTheProductStockAfterUpdateProductStockForOrder
@@ -69,14 +67,11 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<Order> getAllUserOrders(UUID userId) {
-
         List<Order> orders = orderRepository.findByUserIdOrderByOrderDateDesc(userId);
-
         return orders;
     }
 
     private void handleOrderStatusTransition(OrderStatus currentStatus, Order order) {
-
         if (currentStatus == OrderStatus.HAZIRLANIYOR) {
             order.setStatus(OrderStatus.KARGODA);
         } else if (currentStatus == OrderStatus.KARGODA) {

@@ -10,5 +10,5 @@ public interface SubCategoryService {
     void update(SubCategory subCategory);
     List<SubCategory> getAll();
     List<SubCategory> getAllByCategoryId(Integer categoryId);
-    Optional<SubCategory> findById(Integer id);
+    Optional<SubCategory> getById(Integer id);
 } 

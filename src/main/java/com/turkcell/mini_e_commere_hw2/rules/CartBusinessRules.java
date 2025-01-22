@@ -3,17 +3,14 @@ package com.turkcell.mini_e_commere_hw2.rules;
 import com.turkcell.mini_e_commere_hw2.repository.CartItemRepository;
 import com.turkcell.mini_e_commere_hw2.repository.CartRepository;
 import com.turkcell.mini_e_commere_hw2.util.exception.type.BusinessException;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
+
 @Component
+@AllArgsConstructor
 public class CartBusinessRules {
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
-
-    public CartBusinessRules(CartRepository cartRepository, CartItemRepository cartItemRepository)
-    {
-        this.cartRepository = cartRepository;
-        this.cartItemRepository = cartItemRepository;
-    }
 
     public void cartIdMustExist(Integer id)
     {
