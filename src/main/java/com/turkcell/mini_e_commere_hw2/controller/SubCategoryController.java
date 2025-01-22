@@ -3,9 +3,8 @@ package com.turkcell.mini_e_commere_hw2.controller;
 import com.turkcell.mini_e_commere_hw2.dto.subcategory.CreateSubCategoryDto;
 import com.turkcell.mini_e_commere_hw2.dto.subcategory.SubCategoryListingDto;
 import com.turkcell.mini_e_commere_hw2.dto.subcategory.UpdateSubCategoryDto;
-import com.turkcell.mini_e_commere_hw2.service.SubCategoryService;
+import com.turkcell.mini_e_commere_hw2.service.domain.SubCategoryService;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

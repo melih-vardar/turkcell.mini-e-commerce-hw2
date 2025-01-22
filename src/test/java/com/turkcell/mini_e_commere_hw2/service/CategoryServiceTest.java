@@ -9,6 +9,8 @@ import com.turkcell.mini_e_commere_hw2.repository.CategoryRepository;
 import com.turkcell.mini_e_commere_hw2.repository.ProductRepository;
 import com.turkcell.mini_e_commere_hw2.repository.SubCategoryRepository;
 import com.turkcell.mini_e_commere_hw2.rules.CategoryBusinessRules;
+import com.turkcell.mini_e_commere_hw2.service.domain.CategoryService;
+import com.turkcell.mini_e_commere_hw2.service.domain.CategoryServiceImpl;
 import com.turkcell.mini_e_commere_hw2.util.exception.type.BusinessException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,7 +43,7 @@ class CategoryServiceTest {
 
     @BeforeEach
     void setUp() {
-        categoryService = new CategoryServiceImpl(categoryRepository, categoryBusinessRules, 
+        categoryService = new CategoryServiceImpl(categoryRepository, categoryBusinessRules,
                 subCategoryRepository, productRepository);
     }
 

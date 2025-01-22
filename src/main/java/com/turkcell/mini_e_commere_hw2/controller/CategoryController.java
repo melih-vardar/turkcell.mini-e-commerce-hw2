@@ -3,7 +3,7 @@ package com.turkcell.mini_e_commere_hw2.controller;
 import com.turkcell.mini_e_commere_hw2.dto.category.CategoryListingDto;
 import com.turkcell.mini_e_commere_hw2.dto.category.CreateCategoryDto;
 import com.turkcell.mini_e_commere_hw2.dto.category.UpdateCategoryDto;
-import com.turkcell.mini_e_commere_hw2.service.CategoryService;
+import com.turkcell.mini_e_commere_hw2.service.domain.CategoryService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
