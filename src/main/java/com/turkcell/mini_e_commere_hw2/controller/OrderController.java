@@ -1,8 +1,7 @@
 package com.turkcell.mini_e_commere_hw2.controller;
 
 import com.turkcell.mini_e_commere_hw2.dto.order.OrderListingDto;
-import com.turkcell.mini_e_commere_hw2.service.OrderService;
-import lombok.AllArgsConstructor;
+import com.turkcell.mini_e_commere_hw2.service.domain.OrderService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

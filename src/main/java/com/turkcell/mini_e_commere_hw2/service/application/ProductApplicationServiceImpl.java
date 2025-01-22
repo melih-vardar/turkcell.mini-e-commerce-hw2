@@ -40,7 +40,12 @@ public class ProductApplicationServiceImpl implements ProductApplicationService 
     }
 
     @Override
-    public List<ProductListingDto> search(String categoryId, String subCategoryId, BigDecimal minPrice, BigDecimal maxPrice, Boolean inStock) {
+    public List<ProductListingDto> search(
+            String categoryId,
+            String subCategoryId,
+            BigDecimal minPrice,
+            BigDecimal maxPrice,
+            Boolean inStock) {
         List<Product> products = productService.search(categoryId, subCategoryId, minPrice, maxPrice, inStock);
         return products.stream()
                 .map(product -> modelMapper.map(product, ProductListingDto.class))

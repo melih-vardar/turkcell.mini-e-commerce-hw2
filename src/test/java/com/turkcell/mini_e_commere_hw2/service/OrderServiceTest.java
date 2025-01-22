@@ -2,10 +2,11 @@ package com.turkcell.mini_e_commere_hw2.service;
 
 import com.turkcell.mini_e_commere_hw2.dto.order.OrderListingDto;
 import com.turkcell.mini_e_commere_hw2.entity.*;
-import com.turkcell.mini_e_commere_hw2.enums.OrderStatus;
 import com.turkcell.mini_e_commere_hw2.repository.OrderItemRepository;
 import com.turkcell.mini_e_commere_hw2.repository.OrderRepository;
 import com.turkcell.mini_e_commere_hw2.rules.OrderBusinessRules;
+import com.turkcell.mini_e_commere_hw2.service.domain.OrderService;
+import com.turkcell.mini_e_commere_hw2.service.domain.OrderServiceImpl;
 import com.turkcell.mini_e_commere_hw2.util.exception.type.BusinessException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,7 +46,7 @@ class OrderServiceTest {
 
     @BeforeEach
     void setUp() {
-        orderService = new OrderServiceImpl(orderRepository, orderBusinessRules, 
+        orderService = new OrderServiceImpl(orderRepository, orderBusinessRules,
                 productService, userService, cartService);
     }
 

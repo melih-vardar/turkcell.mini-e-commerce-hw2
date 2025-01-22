@@ -1,15 +1,12 @@
-package com.turkcell.mini_e_commere_hw2.service;
-
-import com.turkcell.mini_e_commere_hw2.dto.order.OrderItemDto;
-import com.turkcell.mini_e_commere_hw2.dto.order.OrderListingDto;
-import com.turkcell.mini_e_commere_hw2.entity.Cart;
+package com.turkcell.mini_e_commere_hw2.service.domain;
 import com.turkcell.mini_e_commere_hw2.entity.Order;
 import com.turkcell.mini_e_commere_hw2.entity.OrderItem;
 import com.turkcell.mini_e_commere_hw2.enums.OrderStatus;
 import com.turkcell.mini_e_commere_hw2.entity.User;
-import com.turkcell.mini_e_commere_hw2.repository.OrderItemRepository;
 import com.turkcell.mini_e_commere_hw2.repository.OrderRepository;
 import com.turkcell.mini_e_commere_hw2.rules.OrderBusinessRules;
+import com.turkcell.mini_e_commere_hw2.service.CartService;
+import com.turkcell.mini_e_commere_hw2.service.UserService;
 import com.turkcell.mini_e_commere_hw2.util.exception.type.BusinessException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,15 +22,16 @@ import java.util.stream.Collectors;
 public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final OrderBusinessRules orderBusinessRules;
-    private final ProductService productService;
     private final UserService userService;
     private final CartService cartService;
 
     @Override
-    public OrderListingDto createOrder(UUID userId) {
+    public Order createOrder(UUID userId) {
         User user = userService.findById(userId);
         orderBusinessRules.cartMustNotBeEmpty(user.getCart());
-        orderBusinessRules.checkTheProductStockAfterUpdateProductStockForOrder(user.getCart(), productService);
+        orderBusinessRules.
+                checkTheProductStockAfterUpdateProductStockForOrder
+                        (user.getCart());
 
         Order order = new Order();
         order.setUser(user);
@@ -56,64 +54,25 @@ public class OrderServiceImpl implements OrderService {
         cartService.resetCart(user.getCart().getId());
         orderRepository.save(order);
 
-        return new OrderListingDto(
-                order.getId(),
-                order.getUser().getId(),
-                order.getOrderItems().stream().map(
-                        item -> new OrderItemDto(
-                                item.getId(),
-                                item.getProduct().getId(),
-                                item.getQuantity(),
-                                item.getPrice()
-                        )).collect(Collectors.toList()),
-                order.getTotalPrice(),
-                order.getOrderDate(),
-                order.getStatus().name()
-        );
+        return order;
     }
 
     @Override
-    public OrderListingDto updateOrderState(Integer id) {
+    public Order updateOrderState(Integer id) {
         Order order = orderRepository.findById(id).orElseThrow(() -> new BusinessException("Order not found"));
         OrderStatus currentStatus = order.getStatus();
         handleOrderStatusTransition(currentStatus, order);
         orderRepository.save(order);
 
-        return new OrderListingDto(
-                order.getId(),
-                order.getUser().getId(),
-                order.getOrderItems().stream().map(
-                        item -> new OrderItemDto(
-                                item.getId(),
-                                item.getProduct().getId(),
-                                item.getQuantity(),
-                                item.getPrice()
-                        )).collect(Collectors.toList()),
-                order.getTotalPrice(),
-                order.getOrderDate(),
-                order.getStatus().name()
-        );
+        return order;
     }
 
     @Override
-    public List<OrderListingDto> getAllUserOrders(UUID userId) {
+    public List<Order> getAllUserOrders(UUID userId) {
 
         List<Order> orders = orderRepository.findByUserIdOrderByOrderDateDesc(userId);
 
-        return orders.stream().map(order -> new OrderListingDto(
-                order.getId(),
-                order.getUser().getId(),
-                order.getOrderItems().stream().map(
-                        item -> new OrderItemDto(
-                                item.getId(),
-                                item.getProduct().getId(),
-                                item.getQuantity(),
-                                item.getPrice()
-                        )).collect(Collectors.toList()),
-                order.getTotalPrice(),
-                order.getOrderDate(),
-                order.getStatus().name()
-        )).collect(Collectors.toList());
+        return orders;
     }
 
     private void handleOrderStatusTransition(OrderStatus currentStatus, Order order) {
