@@ -3,7 +3,7 @@ package com.turkcell.mini_e_commere_hw2.controller;
 import com.turkcell.mini_e_commere_hw2.dto.category.CategoryListingDto;
 import com.turkcell.mini_e_commere_hw2.dto.category.CreateCategoryDto;
 import com.turkcell.mini_e_commere_hw2.dto.category.UpdateCategoryDto;
-import com.turkcell.mini_e_commere_hw2.service.domain.CategoryService;
+import com.turkcell.mini_e_commere_hw2.service.application.CategoryApplicationService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,35 +12,35 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/categories")
 public class CategoryController {
-    private final CategoryService categoryService;
+    private final CategoryApplicationService categoryApplicationService;
 
-    public CategoryController(CategoryService categoryService) {
-        this.categoryService = categoryService;
+    public CategoryController(CategoryApplicationService categoryApplicationService) {
+        this.categoryApplicationService = categoryApplicationService;
     }
 
     @PostMapping
     public void add(@RequestBody @Valid CreateCategoryDto createCategoryDto) {
-        categoryService.add(createCategoryDto);
+        categoryApplicationService.add(createCategoryDto);
     }
 
     @PutMapping
     public void update(@RequestBody @Valid UpdateCategoryDto updateCategoryDto) {
-        categoryService.update(updateCategoryDto);
+        categoryApplicationService.update(updateCategoryDto);
     }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Integer id) {
-        categoryService.delete(id);
+        categoryApplicationService.delete(id);
     }
 
     @GetMapping
     public List<CategoryListingDto> getAll() {
-        return categoryService.getAll();
+        return categoryApplicationService.getAll();
     }
 
     @GetMapping("/{id}")
     public CategoryListingDto getById(@PathVariable Integer id) {
-        return categoryService.getById(id);
+        return categoryApplicationService.getById(id);
     }
 
     @PutMapping("/addSubCategory")

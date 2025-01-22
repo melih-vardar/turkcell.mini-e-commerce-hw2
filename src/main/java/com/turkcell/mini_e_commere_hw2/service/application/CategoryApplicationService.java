@@ -9,6 +9,8 @@ import java.util.List;
 public interface CategoryApplicationService {
     void add(CreateCategoryDto createCategoryDto);
     void update(UpdateCategoryDto updateCategoryDto);
+    void delete(Integer id);
     List<CategoryListingDto> getAll();
     CategoryListingDto getById(Integer id);
+    void addSubCategory(Integer categoryId, Integer subCategoryId);
 }
