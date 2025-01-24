@@ -28,7 +28,7 @@ public class SubCategoryApplicationServiceImpl implements SubCategoryApplication
     @Override
     public void update(UpdateSubCategoryDto updateSubCategoryDto) {
         SubCategory subCategory = modelMapper.map(updateSubCategoryDto, SubCategory.class);
-        subCategoryService.add(subCategory);
+        subCategoryService.update(subCategory);
     }
 
     @Override
