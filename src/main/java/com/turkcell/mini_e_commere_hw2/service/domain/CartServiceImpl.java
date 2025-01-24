@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -35,7 +36,9 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public void addCartItemToCart(Integer cartId, Integer productId, Integer quantity) {
+    public void addCartItemToCart(UUID userId, Integer productId, Integer quantity) {
+        int cartId = getCartIdByUserId(userId);
+
         cartBusinessRules.cartIdMustExist(cartId);
         productBusinessRules.productIdMustExist(productId);
         productBusinessRules.productMustBeInStock(productId, quantity);
@@ -76,7 +79,9 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public void removeCartItemFromCart(Integer cartId, Integer cartItemId, Integer quantity) {
+    public void removeCartItemFromCart(UUID userId, Integer cartItemId, Integer quantity) {
+        int cartId = getCartIdByUserId(userId);
+
         cartBusinessRules.cartIdMustExist(cartId);
         cartBusinessRules.cartItemMustExist(cartItemId);
         
@@ -121,5 +126,18 @@ public class CartServiceImpl implements CartService {
     @Override
     public boolean existsById(Integer id) {
         return cartRepository.existsById(id);
+    }
+
+    @Override
+    public int getCartIdByUserId(UUID userId) {
+        return cartRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Cart not found"))
+                .getId();
+    }
+
+    @Override
+    public Object getMyCart(UUID activeUserId) {
+        return cartRepository.findByUserId(activeUserId)
+                .orElseThrow(() -> new RuntimeException("Cart not found"));
     }
 }

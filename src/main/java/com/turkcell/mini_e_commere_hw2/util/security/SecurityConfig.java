@@ -23,7 +23,8 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .httpBasic(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests((req) -> req
-                    .requestMatchers("/api/v1/orders/**").authenticated()
+                    .requestMatchers(HttpMethod.GET,"/api/v1/orders/**").authenticated()
+                    .requestMatchers(HttpMethod.POST, "/api/v1/orders").hasAnyAuthority("customer")
                     .requestMatchers(HttpMethod.GET,"/api/v1/categories/**").permitAll()
                     .requestMatchers(HttpMethod.GET,"/api/v1/sub-categories/**").permitAll()
                     .requestMatchers(HttpMethod.GET,"/api/v1/products/**").permitAll()
@@ -31,9 +32,7 @@ public class SecurityConfig {
                     .requestMatchers(HttpMethod.DELETE, "/api/v1/products").hasAnyAuthority("seller")
                     .requestMatchers(HttpMethod.PUT, "/api/v1/products").hasAnyAuthority("seller")
                     .requestMatchers("/api/v1/auth/**").permitAll()
-                    .requestMatchers(HttpMethod.POST, "/api/v1/carts").hasAnyAuthority("customer")
-                    .requestMatchers(HttpMethod.DELETE, "/api/v1/carts").hasAnyAuthority("customer")
-                    .requestMatchers(HttpMethod.PUT, "/api/v1/carts").hasAnyAuthority("customer")
+                    .requestMatchers("/api/v1/carts/**").hasAnyAuthority("customer")
                     .requestMatchers("/api/v1/**").hasAnyAuthority("admin")
                     .requestMatchers("/v3/api-docs/**",
                                    "/swagger-ui/**",

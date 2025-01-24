@@ -1,85 +1,113 @@
 package com.turkcell.mini_e_commere_hw2.service.domain;
 
 import com.turkcell.mini_e_commere_hw2.entity.Category;
-import com.turkcell.mini_e_commere_hw2.entity.SubCategory;
 import com.turkcell.mini_e_commere_hw2.repository.CategoryRepository;
-import com.turkcell.mini_e_commere_hw2.repository.SubCategoryRepository;
 import com.turkcell.mini_e_commere_hw2.rules.CategoryBusinessRules;
 import com.turkcell.mini_e_commere_hw2.util.exception.type.BusinessException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class CategoryServiceImpl implements CategoryService{
-  private final CategoryRepository categoryRepository;
-  private final CategoryBusinessRules categoryBusinessRules;
-  private final SubCategoryRepository subCategoryRepository;
+public class CategoryServiceImpl implements CategoryService {
+    private final CategoryRepository categoryRepository;
+    private final CategoryBusinessRules categoryBusinessRules;
 
-  @Override
-  public void add(Category category) {
-    Category categoryWithSameName = categoryRepository
-            .findByName(category.getName())
-            .orElse(null);
+    @Override
+    @Transactional
+    public void add(Category category) {
+        Category categoryWithSameName = categoryRepository
+                .findByName(category.getName())
+                .orElse(null);
 
-    if (categoryWithSameName != null)
-      throw new BusinessException("Category already exists");
+        if (categoryWithSameName != null)
+            throw new BusinessException("Category already exists");
 
-    categoryRepository.save(category);
-  }
+        if (category.getParent() != null) {
+            categoryBusinessRules.categoryMustExist(category.getParent().getId());
+        }
 
-  @Override
-  public void update(Category category) {
-    categoryBusinessRules.categoryMustExist(category.getId());
+        categoryRepository.save(category);
+    }
 
-    Category categoryToUpdate = categoryRepository.findById(category.getId())
-            .orElseThrow(() -> new BusinessException("Category not found"));
+    @Override
+    @Transactional
+    public void update(Category category) {
+        categoryBusinessRules.categoryMustExist(category.getId());
 
-    categoryRepository.save(categoryToUpdate);
-  }
+        Category categoryToUpdate = categoryRepository.findById(category.getId())
+                .orElseThrow(() -> new BusinessException("Category not found"));
 
-  @Override
-  public void delete(Integer id) {
-    categoryBusinessRules.categoryMustExist(id);
-    categoryBusinessRules.categoryMustNotHaveAssociatedProducts(id);
+        if (!categoryToUpdate.getName().equals(category.getName())) {
+            if (categoryRepository.findByName(category.getName()).isPresent()) {
+                throw new BusinessException("Category with this name already exists");
+            }
+        }
 
-    Category categoryToUpdate = categoryRepository.findById(id)
-            .orElseThrow(() -> new BusinessException("Category not found"));
+        categoryToUpdate.setName(category.getName());
+        if (category.getParent() != null) {
+            categoryBusinessRules.categoryMustExist(category.getParent().getId());
+            if (category.getId().equals(category.getParent().getId())) {
+                throw new BusinessException("A category cannot be its own parent");
+            }
+            categoryToUpdate.setParent(category.getParent());
+        }
 
-    categoryRepository.delete(categoryToUpdate);
-  }
+        categoryRepository.save(categoryToUpdate);
+    }
 
-  @Override
-  public List<Category> getAll() {
-    return categoryRepository.findAll();
-  }
+    @Override
+    @Transactional
+    public void delete(Integer id) {
+        categoryBusinessRules.categoryMustExist(id);
+        categoryBusinessRules.categoryMustNotHaveAssociatedProducts(id);
+        categoryBusinessRules.categoryMustNotHaveSubCategories(id);
+
+        categoryRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Category> getAll() {
+        return categoryRepository.findAll();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Category getByIdWithDetails(Integer id) {
+        return categoryRepository.findByIdWithDetails(id)
+                .orElseThrow(() -> new BusinessException("Category not found"));
+    }
 
   @Override
   public Category getById(Integer id) {
-    categoryBusinessRules.categoryMustExist(id);
-
     return categoryRepository.findById(id)
-            .orElseThrow(() -> new BusinessException("Category not found"));
+      .orElseThrow(() -> new BusinessException("Category not found"));
   }
 
   @Override
-  public void addSubCategory(Integer categoryId, Integer subCategoryId) {
-    categoryBusinessRules.categoryMustExist(subCategoryId);
+    @Transactional
+    public void addSubCategory(Integer parentId, Category subCategory) {
+        categoryBusinessRules.categoryMustExist(parentId);
 
-    Category categoryToAddSubcategory = categoryRepository.findById(categoryId)
-            .orElseThrow(() -> new BusinessException("Category not found"));
+        Category parentCategory = categoryRepository.findById(parentId)
+                .orElseThrow(() -> new BusinessException("Parent category not found"));
 
-    SubCategory subCategory = subCategoryRepository.findById(subCategoryId)
-            .orElseThrow(() -> new BusinessException("SubCategory not found"));
+        if (categoryRepository.findByName(subCategory.getName()).isPresent()) {
+            throw new BusinessException("Category with this name already exists");
+        }
 
-    if (categoryToAddSubcategory.getSubCategories() == null)
-      categoryToAddSubcategory.setSubCategories(new ArrayList<>());
+        subCategory.setParent(parentCategory);
+        categoryRepository.save(subCategory);
+    }
 
-    categoryToAddSubcategory.getSubCategories().add(subCategory);
-
-    categoryRepository.save(categoryToAddSubcategory);
-  }
+    @Override
+    @Transactional(readOnly = true)
+    public List<Category> getAllSubCategories(Integer parentId) {
+        categoryBusinessRules.categoryMustExist(parentId);
+        return categoryRepository.findAllByParentId(parentId);
+    }
 }

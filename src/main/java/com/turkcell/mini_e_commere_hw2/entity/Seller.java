@@ -8,11 +8,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name="sellers")
+@Table(name = "sellers")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-public class Seller extends User{
+public class Seller extends User {
     private String companyName;
 }

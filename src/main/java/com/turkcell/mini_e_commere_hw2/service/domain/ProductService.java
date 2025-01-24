@@ -10,7 +10,7 @@ public interface ProductService {
     Product getById(Integer id);
     Product getByName(String name);
     List<Product> getAll();
-    List<Product> search(String categoryId, String subCategoryId, BigDecimal minPrice, BigDecimal maxPrice, Boolean inStock);
+    List<Product> search(String categoryId, BigDecimal minPrice, BigDecimal maxPrice, Boolean inStock);
     void add(Product product);
     void update(Product product);
 }

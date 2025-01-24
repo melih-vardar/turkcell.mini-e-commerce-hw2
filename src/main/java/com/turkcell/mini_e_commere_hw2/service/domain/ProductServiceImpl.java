@@ -2,7 +2,7 @@ package com.turkcell.mini_e_commere_hw2.service.domain;
 
 import com.turkcell.mini_e_commere_hw2.entity.Product;
 import com.turkcell.mini_e_commere_hw2.repository.ProductRepository;
-import com.turkcell.mini_e_commere_hw2.rules.SubCategoryBusinessRules;
+import com.turkcell.mini_e_commere_hw2.rules.CategoryBusinessRules;
 import com.turkcell.mini_e_commere_hw2.util.exception.type.BusinessException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,11 +14,11 @@ import java.util.List;
 @AllArgsConstructor
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
-    private final SubCategoryBusinessRules subCategoryBusinessRules;
+    private final CategoryBusinessRules categoryBusinessRules;
 
     @Override
     public void add(Product product) {
-        subCategoryBusinessRules.subCategoryMustExist(product.getSubCategory().getId());
+        categoryBusinessRules.categoryMustExist(product.getCategory().getId());
         Product productWithSameName = productRepository
                 .findByName(product.getName())
                 .orElse(null);
@@ -31,7 +31,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void update(Product product) {
-        subCategoryBusinessRules.subCategoryMustExist(product.getSubCategory().getId());
+        categoryBusinessRules.categoryMustExist(product.getCategory().getId());
 
         Product productWithSameName = productRepository
                 .findByNameIsAndIdIsNot(product.getName(), product.getId())
@@ -52,8 +52,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<Product> search(String categoryId, String subCategoryId, BigDecimal minPrice, BigDecimal maxPrice, Boolean inStock) {
-        return productRepository.search(categoryId, subCategoryId, minPrice, maxPrice, inStock);
+    public List<Product> search(String categoryId, BigDecimal minPrice, BigDecimal maxPrice, Boolean inStock) {
+        return productRepository.search(categoryId, minPrice, maxPrice, inStock);
     }
 
     @Override

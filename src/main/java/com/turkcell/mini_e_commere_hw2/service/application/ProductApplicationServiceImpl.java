@@ -4,6 +4,7 @@ import com.turkcell.mini_e_commere_hw2.dto.product.CreateProductDto;
 import com.turkcell.mini_e_commere_hw2.dto.product.ProductListingDto;
 import com.turkcell.mini_e_commere_hw2.dto.product.UpdateProductDto;
 import com.turkcell.mini_e_commere_hw2.entity.Product;
+import com.turkcell.mini_e_commere_hw2.service.domain.CategoryService;
 import com.turkcell.mini_e_commere_hw2.service.domain.ProductService;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -17,11 +18,13 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class ProductApplicationServiceImpl implements ProductApplicationService {
     private final ProductService productService;
+    private final CategoryService categoryService;
     private final ModelMapper modelMapper;
 
     @Override
     public void add(CreateProductDto createProductDto) {
         Product product = modelMapper.map(createProductDto, Product.class);
+        product.setCategory(categoryService.getById(createProductDto.getCategoryId()));
         productService.add(product);
     }
 
@@ -42,11 +45,10 @@ public class ProductApplicationServiceImpl implements ProductApplicationService 
     @Override
     public List<ProductListingDto> search(
             String categoryId,
-            String subCategoryId,
             BigDecimal minPrice,
             BigDecimal maxPrice,
             Boolean inStock) {
-        List<Product> products = productService.search(categoryId, subCategoryId, minPrice, maxPrice, inStock);
+        List<Product> products = productService.search(categoryId, minPrice, maxPrice, inStock);
         return products.stream()
                 .map(product -> modelMapper.map(product, ProductListingDto.class))
                 .collect(Collectors.toList());

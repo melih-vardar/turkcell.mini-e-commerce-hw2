@@ -5,6 +5,7 @@ import com.turkcell.mini_e_commere_hw2.dto.cart.CartListingDto;
 import com.turkcell.mini_e_commere_hw2.dto.cart.RemoveFromCartDto;
 import com.turkcell.mini_e_commere_hw2.service.application.CartApplicationService;
 import lombok.AllArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,19 +16,26 @@ import java.util.List;
 public class CartController {
     private final CartApplicationService cartApplicationService;
 
-    @PostMapping("/{cartId}")
-    public void addCartItemToCart(@PathVariable Integer cartId, @RequestBody AddToCartDto addToCartDto) {
-        this.cartApplicationService.addCartItemToCart(cartId, addToCartDto);
+    @PostMapping()
+    public void addCartItemToCart(@RequestBody AddToCartDto addToCartDto) {
+        this.cartApplicationService.addCartItemToCart(addToCartDto);
     }
 
-    @DeleteMapping("/{cartId}")
-    public void removeCartItemFromCart(@PathVariable Integer cartId, @RequestBody RemoveFromCartDto removeFromCartDto) {
-        this.cartApplicationService.removeCartItemFromCart(cartId, removeFromCartDto);
+    @DeleteMapping()
+    public void removeCartItemFromCart(@RequestBody RemoveFromCartDto removeFromCartDto) {
+        this.cartApplicationService.removeCartItemFromCart(removeFromCartDto);
     }
 
-    @GetMapping
+    @GetMapping("/all")
+    @PreAuthorize("hasAuthority('admin')")
     public List<CartListingDto> getAll() {
         return this.cartApplicationService.getAll();
+    }
+
+    @GetMapping()
+    @PreAuthorize("hasAuthority('customer')")
+    public CartListingDto getMyCart() {
+        return this.cartApplicationService.getMyCart();
     }
 
     @GetMapping("/{cartId}")

@@ -27,8 +27,8 @@ public class Product {
     private int stock;
 
     @ManyToOne
-    @JoinColumn(name="sub_category_id")
-    private SubCategory subCategory;
+    @JoinColumn(name="category_id")
+    private Category category;
 
     @Column(name="description")
     private String description;

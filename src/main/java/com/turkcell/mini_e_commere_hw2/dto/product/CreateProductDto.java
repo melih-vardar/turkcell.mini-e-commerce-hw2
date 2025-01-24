@@ -23,8 +23,8 @@ public class CreateProductDto {
     @Min(value = 0, message = "Stock must be greater than or equal to 0")
     private int stock;
 
-    @NotNull(message = "SubCategory ID cannot be null")
-    private Integer subCategoryId;
+    @NotNull(message = "Category ID cannot be null")
+    private Integer categoryId;
 
     @Length(max = 500, message = "Description must be at most 500 characters")
     private String description;

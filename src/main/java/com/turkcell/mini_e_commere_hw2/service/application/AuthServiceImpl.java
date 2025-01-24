@@ -36,12 +36,8 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AuthUserDto register(RegisterAdminDto registerAdminDto) {
         userBusinessRules.usernameMustNotExist(registerAdminDto.getUsername());
-        userBusinessRules.passwordMustBeValid(registerAdminDto.getPassword());
 
-        Admin admin = new Admin();
-        admin.setName(registerAdminDto.getName());
-        admin.setSurname(registerAdminDto.getSurname());
-        admin.setUsername(registerAdminDto.getUsername());
+        Admin admin = modelMapper.map(registerAdminDto, Admin.class);
         admin.setPassword(passwordEncoder.encode(registerAdminDto.getPassword()));
 
         // Set admin role
@@ -62,12 +58,8 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AuthUserDto register(RegisterCustomerDto registerCustomerDto) {
         userBusinessRules.usernameMustNotExist(registerCustomerDto.getUsername());
-        userBusinessRules.passwordMustBeValid(registerCustomerDto.getPassword());
 
-        Customer customer = new Customer();
-        customer.setName(registerCustomerDto.getName());
-        customer.setSurname(registerCustomerDto.getSurname());
-        customer.setUsername(registerCustomerDto.getUsername());
+        Customer customer = modelMapper.map(registerCustomerDto, Customer.class);
         customer.setPassword(passwordEncoder.encode(registerCustomerDto.getPassword()));
 
         // Create and associate cart
@@ -94,14 +86,9 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AuthUserDto register(RegisterSellerDto registerSellerDto) {
         userBusinessRules.usernameMustNotExist(registerSellerDto.getUsername());
-        userBusinessRules.passwordMustBeValid(registerSellerDto.getPassword());
 
-        Seller seller = new Seller();
-        seller.setName(registerSellerDto.getName());
-        seller.setSurname(registerSellerDto.getSurname());
-        seller.setUsername(registerSellerDto.getUsername());
+        Seller seller = modelMapper.map(registerSellerDto, Seller.class);
         seller.setPassword(passwordEncoder.encode(registerSellerDto.getPassword()));
-        seller.setCompanyName(registerSellerDto.getCompanyName());
 
         // Set seller role
         addIfNotExistsOperationClaim("seller");
@@ -143,7 +130,7 @@ public class AuthServiceImpl implements AuthService {
 
     private Map<String,Object> getRoles(User user){
         Map<String,Object> roles = new HashMap<>();
-        roles.put("roles", user.getOperationClaims().stream().map(c->c.getName()).toList());
+        roles.put("roles", user.getOperationClaims().stream().map(OperationClaim::getName).toList());
         return roles;
     }
 }

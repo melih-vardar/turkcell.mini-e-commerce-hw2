@@ -39,7 +39,7 @@ public class ProductBusinessRules {
     }
 
     //Sepette aynı üründen varsa, eklenen miktar stok miktarını aşmamalı
-    public void productMustBeInStockInCart(Integer productId, Integer quantity, Integer cartId) {
+    public void productMustBeInStockInCart(Integer cartId, Integer productId, Integer quantity) {
         if (cartRepository.existsById(cartId)) {
             Cart cart = cartRepository.findById(cartId).get();
             if (cart.getCartItems().stream().filter(cartItem -> cartItem.getProduct().equals(productId)).findFirst().get().getQuantity() + quantity > productRepository.findById(productId).get().getStock()) {

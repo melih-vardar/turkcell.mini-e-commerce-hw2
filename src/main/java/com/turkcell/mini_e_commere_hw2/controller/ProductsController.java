@@ -31,11 +31,10 @@ public class ProductsController {
 
     @GetMapping("/search")
     public List<ProductListingDto> search(@RequestParam @Nullable String categoryId,
-                                          @RequestParam @Nullable String subCategoryId,
                                           @RequestParam @Nullable BigDecimal minPrice,
                                           @RequestParam @Nullable BigDecimal maxPrice,
                                           @RequestParam @Nullable Boolean inStock) {
-        return this.productApplicationService.search(categoryId, subCategoryId, minPrice, maxPrice, inStock);
+        return this.productApplicationService.search(categoryId, minPrice, maxPrice, inStock);
     }
 
     @PutMapping

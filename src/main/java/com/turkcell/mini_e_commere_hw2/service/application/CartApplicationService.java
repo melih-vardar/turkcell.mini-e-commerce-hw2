@@ -9,7 +9,9 @@ import java.util.List;
 public interface CartApplicationService {
     CartListingDto getById(Integer id);
     List<CartListingDto> getAll();
-    void addCartItemToCart(Integer cartId, AddToCartDto addToCartDto);
-    void removeCartItemFromCart(Integer cartId, RemoveFromCartDto removeFromCartDto);
+    void addCartItemToCart(AddToCartDto addToCartDto);
+    void removeCartItemFromCart(RemoveFromCartDto removeFromCartDto);
     void resetCart(Integer cartId);
+
+    CartListingDto getMyCart();
 }

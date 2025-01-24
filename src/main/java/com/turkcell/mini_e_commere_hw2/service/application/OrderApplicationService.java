@@ -6,8 +6,12 @@ import java.util.List;
 import java.util.UUID;
 
 public interface OrderApplicationService {
-
+    OrderListingDto createOrder();
     OrderListingDto createOrder(UUID userId);
     OrderListingDto updateOrderState(Integer id);
-    List<OrderListingDto> getAllUserOrders(UUID id);
+    List<OrderListingDto> getAllUserOrders();
+    List<OrderListingDto> getAllUserOrders(UUID userId);
+    OrderListingDto getOrderById(Integer id);
+
+    void deleteOrder(Integer orderId);
 }

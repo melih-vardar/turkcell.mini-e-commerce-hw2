@@ -11,8 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,18 +22,24 @@ public class OrderServiceImpl implements OrderService {
     private final UserService userService;
     private final CartService cartService;
 
+    private static final LinkedList<OrderStatus> ORDER_STATUS_PROGRESSION = new LinkedList<>();
+
+    static {
+        ORDER_STATUS_PROGRESSION.add(OrderStatus.PREPARING);
+        ORDER_STATUS_PROGRESSION.add(OrderStatus.SHIPPED);
+        ORDER_STATUS_PROGRESSION.add(OrderStatus.DELIVERED);
+    }
+
     @Override
     public Order createOrder(UUID userId) {
         User user = userService.getById(userId);
         orderBusinessRules.cartMustNotBeEmpty(user.getCart());
-        orderBusinessRules.
-                checkTheProductStockAfterUpdateProductStockForOrder
-                        (user.getCart());
+        orderBusinessRules.checkTheProductStockAfterUpdateProductStockForOrder(user.getCart());
 
         Order order = new Order();
         order.setUser(user);
         order.setOrderDate(LocalDateTime.now());
-        order.setStatus(OrderStatus.HAZIRLANIYOR);
+        order.setStatus(OrderStatus.PREPARING);
         order.setTotalPrice(user.getCart().getTotalPrice());
 
 
@@ -67,19 +72,31 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<Order> getAllUserOrders(UUID userId) {
-        List<Order> orders = orderRepository.findByUserIdOrderByOrderDateDesc(userId);
-        return orders;
+        return orderRepository.findByUserIdOrderByOrderDateDesc(userId);
+    }
+
+    @Override
+    public Order getOrderById(Integer id) {
+        return orderRepository.findById(id).orElseThrow(() -> new BusinessException("Order not found"));
+    }
+
+    @Override
+    public void deleteOrder(Integer orderId) {
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new BusinessException("Order not found"));
+        orderRepository.delete(order);
     }
 
     private void handleOrderStatusTransition(OrderStatus currentStatus, Order order) {
-        if (currentStatus == OrderStatus.HAZIRLANIYOR) {
-            order.setStatus(OrderStatus.KARGODA);
-        } else if (currentStatus == OrderStatus.KARGODA) {
-            order.setStatus(OrderStatus.TESLIM_EDILDI);
-        } else if (currentStatus == OrderStatus.TESLIM_EDILDI) {
-            throw new BusinessException("Order already delivered. No further status updates allowed.");
-        } else {
+        int currentIndex = ORDER_STATUS_PROGRESSION.indexOf(currentStatus);
+        
+        if (currentIndex == -1 || currentIndex == ORDER_STATUS_PROGRESSION.size() - 1) {
+            if (currentStatus == OrderStatus.DELIVERED) {
+                throw new BusinessException("Order already delivered. No further status updates allowed.");
+            }
             throw new BusinessException("Invalid order status transition.");
         }
+        
+        OrderStatus nextStatus = ORDER_STATUS_PROGRESSION.get(currentIndex + 1);
+        order.setStatus(nextStatus);
     }
 }

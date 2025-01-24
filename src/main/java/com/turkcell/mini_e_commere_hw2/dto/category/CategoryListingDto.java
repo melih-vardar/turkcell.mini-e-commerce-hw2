@@ -14,6 +14,8 @@ import java.util.List;
 public class CategoryListingDto {
     private Integer id;
     private String name;
-    private int subCategoryCount;
-    private List<String> subCategoryName;
+    private Integer parentId;
+    private String parentName;
+    private List<CategoryListingDto> subCategories;
+    private int productCount;
 }

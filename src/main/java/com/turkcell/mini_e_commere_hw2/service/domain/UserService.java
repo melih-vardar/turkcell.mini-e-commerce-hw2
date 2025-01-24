@@ -9,4 +9,6 @@ public interface UserService {
   User getById(UUID userId);
   User getByUsername(String username);
   List<User> getAll();
+  User getActiveUser();
+  UUID getActiveUserId();
 }
