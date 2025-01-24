@@ -29,8 +29,8 @@ public class SecurityConfig {
                     .requestMatchers(HttpMethod.GET,"/api/v1/sub-categories/**").permitAll()
                     .requestMatchers(HttpMethod.GET,"/api/v1/products/**").permitAll()
                     .requestMatchers(HttpMethod.POST, "/api/v1/products").hasAnyAuthority("seller")
-                    .requestMatchers(HttpMethod.DELETE, "/api/v1/products").hasAnyAuthority("seller")
                     .requestMatchers(HttpMethod.PUT, "/api/v1/products").hasAnyAuthority("seller")
+                    .requestMatchers(HttpMethod.DELETE, "/api/v1/products").hasAnyAuthority("seller")
                     .requestMatchers("/api/v1/auth/**").permitAll()
                     .requestMatchers("/api/v1/carts/**").hasAnyAuthority("customer")
                     .requestMatchers("/api/v1/**").hasAnyAuthority("admin")
@@ -38,7 +38,7 @@ public class SecurityConfig {
                                    "/swagger-ui/**",
                                    "/swagger-ui.html",
                                    "/webjars/**").permitAll()
-                    .anyRequest().permitAll()
+                    .anyRequest().authenticated()
             )
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
     return http.build();

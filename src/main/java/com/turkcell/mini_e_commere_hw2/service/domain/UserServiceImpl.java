@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
 
+import com.turkcell.mini_e_commere_hw2.dto.user.UserUpdateDto;
+
 @Service
 @AllArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -53,5 +55,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public UUID getActiveUserId() {
         return getActiveUser().getId();
+    }
+
+    @Override
+    public void update(User user) {
+        userRepository.save(user);
+    }
+
+    @Override
+    public void delete(UUID id) {
+        userRepository.deleteById(id);
     }
 }

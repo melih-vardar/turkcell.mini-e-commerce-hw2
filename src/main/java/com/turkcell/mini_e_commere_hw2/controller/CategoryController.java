@@ -4,8 +4,6 @@ import com.turkcell.mini_e_commere_hw2.dto.category.CategoryListingDto;
 import com.turkcell.mini_e_commere_hw2.dto.category.CreateCategoryDto;
 import com.turkcell.mini_e_commere_hw2.dto.category.UpdateCategoryDto;
 import com.turkcell.mini_e_commere_hw2.service.application.CategoryApplicationService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
