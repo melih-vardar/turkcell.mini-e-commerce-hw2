@@ -95,6 +95,10 @@ public class CartServiceImpl implements CartService {
         if (cartItem.getQuantity() <= quantity) {
             // Remove the entire cart item
             cart.getCartItems().remove(cartItem);
+            // Update cart total
+            cart.setTotalPrice(cart.getTotalPrice()
+                    .subtract(cartItem.getProduct().getUnitPrice()
+                            .multiply(BigDecimal.valueOf(cartItem.getQuantity()))));
             cartItemService.delete(cartItem.getId());
         } else {
             // Reduce the quantity
@@ -102,12 +106,13 @@ public class CartServiceImpl implements CartService {
             BigDecimal priceReduction = cartItem.getProduct().getUnitPrice()
                     .multiply(BigDecimal.valueOf(quantity));
             cartItem.setPrice(cartItem.getPrice().subtract(priceReduction));
+            // Update cart total
+            cart.setTotalPrice(cart.getTotalPrice()
+                    .subtract(cartItem.getProduct().getUnitPrice()
+                            .multiply(BigDecimal.valueOf(quantity))));
         }
         
-        // Update cart total
-        cart.setTotalPrice(cart.getTotalPrice()
-                .subtract(cartItem.getProduct().getUnitPrice()
-                        .multiply(BigDecimal.valueOf(quantity))));
+
         
         cartRepository.save(cart);
     }

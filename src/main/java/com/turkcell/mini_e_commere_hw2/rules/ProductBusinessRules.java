@@ -2,12 +2,15 @@ package com.turkcell.mini_e_commere_hw2.rules;
 
 
 import com.turkcell.mini_e_commere_hw2.entity.Cart;
+import com.turkcell.mini_e_commere_hw2.entity.CartItem;
 import com.turkcell.mini_e_commere_hw2.repository.CartRepository;
 import com.turkcell.mini_e_commere_hw2.repository.OrderRepository;
 import com.turkcell.mini_e_commere_hw2.repository.ProductRepository;
 import com.turkcell.mini_e_commere_hw2.util.exception.type.BusinessException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 @Component
 @AllArgsConstructor
@@ -42,8 +45,16 @@ public class ProductBusinessRules {
     public void productMustBeInStockInCart(Integer cartId, Integer productId, Integer quantity) {
         if (cartRepository.existsById(cartId)) {
             Cart cart = cartRepository.findById(cartId).get();
-            if (cart.getCartItems().stream().filter(cartItem -> cartItem.getProduct().equals(productId)).findFirst().get().getQuantity() + quantity > productRepository.findById(productId).get().getStock()) {
-                throw new BusinessException("Product is not in stock");
+
+            Optional<CartItem> optionalCartItem = cart.getCartItems().stream()
+                    .filter(cartItem -> cartItem.getProduct().equals(productId))
+                    .findFirst();
+
+            if (optionalCartItem.isPresent()) {
+                CartItem cartItem = optionalCartItem.get();
+                if (cartItem.getQuantity() + quantity > productRepository.findById(productId).get().getStock()) {
+                    throw new BusinessException("Product is not in stock");
+                }
             }
         }
     }
