@@ -1,37 +1,45 @@
 package com.turkcell.mini_e_commere_hw2.controller;
 
-import com.turkcell.mini_e_commere_hw2.dto.user.*;
-import com.turkcell.mini_e_commere_hw2.service.application.AuthService;
+import an.awesome.pipelinr.Pipeline;
+import com.turkcell.mini_e_commere_hw2.application.auth.command.create.CreateAuthAdminCommand;
+import com.turkcell.mini_e_commere_hw2.application.auth.command.create.CreateAuthCustomerCommand;
+import com.turkcell.mini_e_commere_hw2.application.auth.command.create.CreateAuthSellerCommand;
+import com.turkcell.mini_e_commere_hw2.application.auth.command.create.AuthResponse;
+import com.turkcell.mini_e_commere_hw2.application.auth.command.read.LoginCommand;
+import com.turkcell.mini_e_commere_hw2.core.web.BaseController;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/auth")
-@AllArgsConstructor
-public class AuthController {
-    private final AuthService authService;
+public class AuthController extends BaseController {
 
-    @PostMapping("register/customer")
-    public AuthUserDto register(@RequestBody @Valid RegisterCustomerDto registerCustomerDto) {
-        return authService.register(registerCustomerDto);
+    public AuthController(Pipeline pipeline) {
+        super(pipeline);
     }
 
     @PostMapping("register/admin")
-    public AuthUserDto registerAdmin(@RequestBody @Valid RegisterAdminDto registerAdminDto) {
-        return authService.register(registerAdminDto);
+    @ResponseStatus(code = HttpStatus.CREATED)
+    public AuthResponse registerAdmin(@RequestBody @Valid CreateAuthAdminCommand createAuthAdminCommand) {
+        return createAuthAdminCommand.execute(pipeline);
+    }
+
+    @PostMapping("register/customer")
+    @ResponseStatus(code = HttpStatus.CREATED)
+    public AuthResponse registerCustomer(@RequestBody @Valid CreateAuthCustomerCommand createAuthCustomerCommand) {
+        return createAuthCustomerCommand.execute(pipeline);
     }
 
     @PostMapping("register/seller")
-    public AuthUserDto registerSeller(@RequestBody @Valid RegisterSellerDto registerSellerDto) {
-        return authService.register(registerSellerDto);
+    @ResponseStatus(code = HttpStatus.CREATED)
+    public AuthResponse registerSeller(@RequestBody @Valid CreateAuthSellerCommand createAuthSellerCommand) {
+        return createAuthSellerCommand.execute(pipeline);
     }
 
     @PostMapping("login")
-    public AuthUserDto login(@RequestBody @Valid LoginDto loginDto) {
-        return authService.login(loginDto);
+    @ResponseStatus(code = HttpStatus.OK)
+    public AuthResponse login(@RequestBody @Valid LoginCommand loginCommand) {
+        return loginCommand.execute(pipeline);
     }
 }
