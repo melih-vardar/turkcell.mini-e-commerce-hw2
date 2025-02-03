@@ -3,19 +3,21 @@ package com.turkcell.mini_e_commere_hw2.application.auth.command.create;
 import an.awesome.pipelinr.Command;
 import com.turkcell.mini_e_commere_hw2.entity.Cart;
 import com.turkcell.mini_e_commere_hw2.entity.Customer;
+import com.turkcell.mini_e_commere_hw2.entity.OperationClaim;
 import com.turkcell.mini_e_commere_hw2.repository.CustomerRepository;
+import com.turkcell.mini_e_commere_hw2.repository.OperationClaimRepository;
 import com.turkcell.mini_e_commere_hw2.rules.OperationClaimBusinessRules;
 import com.turkcell.mini_e_commere_hw2.rules.UserBusinessRules;
-import com.turkcell.mini_e_commere_hw2.service.domain.OperationClaimService;
 import com.turkcell.mini_e_commere_hw2.util.jwt.JwtService;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -32,10 +34,10 @@ public class CreateAuthCustomerCommand extends CreateAuthCommand {
                 PasswordEncoder passwordEncoder,
                 OperationClaimBusinessRules operationClaimBusinessRules,
                 JwtService jwtService,
-                OperationClaimService operationClaimService,
+                OperationClaimRepository operationClaimRepository,
                 CustomerRepository customerRepository
         ) {
-            super(userBusinessRules, passwordEncoder, operationClaimBusinessRules, jwtService, operationClaimService);
+            super(userBusinessRules, passwordEncoder, operationClaimBusinessRules, jwtService, operationClaimRepository);
             this.customerRepository = customerRepository;
         }
 
@@ -56,7 +58,10 @@ public class CreateAuthCustomerCommand extends CreateAuthCommand {
             customer.setCart(cart);
 
             addIfNotExistsOperationClaim("customer");
-            customer.setOperationClaims(getOperationClaims("customer"));
+
+            List<OperationClaim> claims = new ArrayList<>();
+            claims.add(getOperationClaimByName("customer"));
+            customer.setOperationClaims(claims);
 
             customerRepository.save(customer);
 

@@ -1,11 +1,17 @@
 package com.turkcell.mini_e_commere_hw2.controller;
 
+import an.awesome.pipelinr.Pipeline;
+import com.turkcell.mini_e_commere_hw2.application.category.commands.create.CreateCategoryCommand;
+import com.turkcell.mini_e_commere_hw2.application.category.commands.create.CreatedCategoryResponse;
+import com.turkcell.mini_e_commere_hw2.application.category.commands.delete.DeleteCategoryCommand;
+import com.turkcell.mini_e_commere_hw2.application.category.commands.update.UpdateCategoryCommand;
+import com.turkcell.mini_e_commere_hw2.application.category.queries.get.GetCategoryByIdQuery;
+import com.turkcell.mini_e_commere_hw2.application.category.queries.list.GetAllCategoriesQuery;
+import com.turkcell.mini_e_commere_hw2.application.category.queries.list.GetCategoryTreeQuery;
+import com.turkcell.mini_e_commere_hw2.application.category.queries.list.GetSubCategoriesQuery;
+import com.turkcell.mini_e_commere_hw2.core.web.BaseController;
 import com.turkcell.mini_e_commere_hw2.dto.category.CategoryListingDto;
-import com.turkcell.mini_e_commere_hw2.dto.category.CreateCategoryDto;
-import com.turkcell.mini_e_commere_hw2.dto.category.UpdateCategoryDto;
-import com.turkcell.mini_e_commere_hw2.service.application.CategoryApplicationService;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,60 +20,55 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/categories")
-@AllArgsConstructor
-public class CategoryController {
-    private final CategoryApplicationService categoryApplicationService;
+public class CategoryController extends BaseController {
+
+    public CategoryController(Pipeline pipeline) {
+        super(pipeline);
+    }
 
     @PostMapping
-    public ResponseEntity<Void> createCategory(@Valid @RequestBody CreateCategoryDto createCategoryDto) {
-        categoryApplicationService.add(createCategoryDto);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+    @ResponseStatus(HttpStatus.CREATED)
+    public CreatedCategoryResponse add(@RequestBody @Valid CreateCategoryCommand command) {
+        return pipeline.send(command);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateCategory(
-            @PathVariable Integer id,
-            @Valid @RequestBody UpdateCategoryDto updateCategoryDto) {
-        updateCategoryDto.setId(id);
-        categoryApplicationService.update(updateCategoryDto);
-        return ResponseEntity.ok().build();
+    public void update(@PathVariable Integer id, @RequestBody @Valid UpdateCategoryCommand command) {
+        command.setId(id);
+        pipeline.send(command);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCategory(@PathVariable Integer id) {
-        categoryApplicationService.delete(id);
-        return ResponseEntity.ok().build();
+    public void delete(@PathVariable Integer id) {
+        pipeline.send(new DeleteCategoryCommand(id));
     }
 
     @GetMapping
-    public ResponseEntity<List<CategoryListingDto>> getAllCategories() {
-        List<CategoryListingDto> categories = categoryApplicationService.getAll();
-        return ResponseEntity.ok(categories);
+    public List<CategoryListingDto> getAll() {
+        return pipeline.send(new GetAllCategoriesQuery());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CategoryListingDto> getCategoryById(@PathVariable Integer id) {
-        CategoryListingDto category = categoryApplicationService.getById(id);
-        return ResponseEntity.ok(category);
-    }
-
-    @GetMapping("/{id}/subcategories")
-    public ResponseEntity<List<CategoryListingDto>> getSubCategories(@PathVariable Integer id) {
-        List<CategoryListingDto> subCategories = categoryApplicationService.getAllSubCategories(id);
-        return ResponseEntity.ok(subCategories);
+    public CategoryListingDto getById(@PathVariable Integer id) {
+        return pipeline.send(new GetCategoryByIdQuery(id));
     }
 
     @PostMapping("/{parentId}/subcategories")
-    public ResponseEntity<Void> addSubCategory(
+    @ResponseStatus(HttpStatus.CREATED)
+    public CreatedCategoryResponse addSubCategory(
             @PathVariable Integer parentId,
-            @Valid @RequestBody CreateCategoryDto createCategoryDto) {
-        categoryApplicationService.addSubCategory(parentId, createCategoryDto);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+            @RequestBody @Valid CreateCategoryCommand command) {
+        command.setParentId(parentId);
+        return pipeline.send(command);
+    }
+
+    @GetMapping("/{parentId}/subcategories")
+    public List<CategoryListingDto> getAllSubCategories(@PathVariable Integer parentId) {
+        return pipeline.send(new GetSubCategoriesQuery(parentId));
     }
 
     @GetMapping("/tree")
-    public ResponseEntity<List<CategoryListingDto>> getCategoryTree() {
-        List<CategoryListingDto> categoryTree = categoryApplicationService.getCategoryTree();
-        return ResponseEntity.ok(categoryTree);
+    public List<CategoryListingDto> getCategoryTree() {
+        return pipeline.send(new GetCategoryTreeQuery());
     }
 }

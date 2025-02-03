@@ -1,18 +1,21 @@
 package com.turkcell.mini_e_commere_hw2.application.auth.command.create;
 
 import an.awesome.pipelinr.Command;
+import com.turkcell.mini_e_commere_hw2.entity.OperationClaim;
 import com.turkcell.mini_e_commere_hw2.entity.Seller;
+import com.turkcell.mini_e_commere_hw2.repository.OperationClaimRepository;
 import com.turkcell.mini_e_commere_hw2.repository.SellerRepository;
 import com.turkcell.mini_e_commere_hw2.rules.OperationClaimBusinessRules;
 import com.turkcell.mini_e_commere_hw2.rules.UserBusinessRules;
-import com.turkcell.mini_e_commere_hw2.service.domain.OperationClaimService;
 import com.turkcell.mini_e_commere_hw2.util.jwt.JwtService;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -29,10 +32,10 @@ public class CreateAuthSellerCommand extends CreateAuthCommand {
                 PasswordEncoder passwordEncoder,
                 OperationClaimBusinessRules operationClaimBusinessRules,
                 JwtService jwtService,
-                OperationClaimService operationClaimService,
+                OperationClaimRepository operationClaimRepository,
                 SellerRepository sellerRepository
         ) {
-            super(userBusinessRules, passwordEncoder, operationClaimBusinessRules, jwtService, operationClaimService);
+            super(userBusinessRules, passwordEncoder, operationClaimBusinessRules, jwtService, operationClaimRepository);
             this.sellerRepository = sellerRepository;
         }
 
@@ -48,7 +51,10 @@ public class CreateAuthSellerCommand extends CreateAuthCommand {
             seller.setCompanyName(command.getCompanyName());
 
             addIfNotExistsOperationClaim("seller");
-            seller.setOperationClaims(getOperationClaims("seller"));
+
+            List<OperationClaim> claims = new ArrayList<>();
+            claims.add(getOperationClaimByName("seller"));
+            seller.setOperationClaims(claims);
 
             sellerRepository.save(seller);
 

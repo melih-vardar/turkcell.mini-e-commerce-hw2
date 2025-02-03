@@ -1,51 +1,67 @@
 package com.turkcell.mini_e_commere_hw2.controller;
 
+import an.awesome.pipelinr.Pipeline;
+import com.turkcell.mini_e_commere_hw2.application.order.commands.create.CreateOrderCommand;
+import com.turkcell.mini_e_commere_hw2.application.order.commands.create.CreatedOrderResponse;
+import com.turkcell.mini_e_commere_hw2.application.order.commands.delete.DeleteOrderCommand;
+import com.turkcell.mini_e_commere_hw2.application.order.commands.update.UpdateOrderStatusCommand;
+import com.turkcell.mini_e_commere_hw2.application.order.queries.get.GetOrderByIdQuery;
+import com.turkcell.mini_e_commere_hw2.application.order.queries.list.GetUserOrdersQuery;
+import com.turkcell.mini_e_commere_hw2.core.web.BaseController;
 import com.turkcell.mini_e_commere_hw2.dto.order.OrderListingDto;
-import com.turkcell.mini_e_commere_hw2.service.application.OrderApplicationService;
-import lombok.AllArgsConstructor;
-import org.springframework.http.ResponseEntity;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
 
-@RestController()
+@RestController
 @RequestMapping("/api/v1/orders")
-@AllArgsConstructor
-public class OrderController {
-    private final OrderApplicationService orderApplicationService;
+public class OrderController extends BaseController {
 
-    @PostMapping()
-    public ResponseEntity<OrderListingDto> createOrder() {
-        return ResponseEntity.ok(orderApplicationService.createOrder());
+    public OrderController(Pipeline pipeline) {
+        super(pipeline);
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public CreatedOrderResponse createOrder() {
+        return pipeline.send(new CreateOrderCommand());
     }
 
     @PostMapping("/admin/create-for-user/{userId}")
     @PreAuthorize("hasAuthority('admin')")
-    public ResponseEntity<OrderListingDto> createOrderForUser(@PathVariable UUID userId) {
-        return ResponseEntity.ok(orderApplicationService.createOrder(userId));
+    @ResponseStatus(HttpStatus.CREATED)
+    public CreatedOrderResponse createOrderForUser(@PathVariable UUID userId) {
+        return pipeline.send(new CreateOrderCommand(userId));
     }
 
     @PutMapping("/{orderId}/status")
-    public ResponseEntity<OrderListingDto> updateOrderState(@PathVariable Integer orderId) {
-        return ResponseEntity.ok(orderApplicationService.updateOrderState(orderId));
+    public void updateOrderStatus(@PathVariable Integer orderId) {
+        pipeline.send(new UpdateOrderStatusCommand(orderId));
     }
 
-    @GetMapping()
-    public ResponseEntity<List<OrderListingDto>> getAllUserOrders() {
-        List<OrderListingDto> orders = orderApplicationService.getAllUserOrders();
-        return ResponseEntity.ok(orders);
+    @GetMapping
+    public List<OrderListingDto> getAllUserOrders() {
+        return pipeline.send(new GetUserOrdersQuery());
+    }
+
+    @GetMapping("/admin/user/{userId}")
+    @PreAuthorize("hasAuthority('admin')")
+    public List<OrderListingDto> getUserOrders(@PathVariable UUID userId) {
+        return pipeline.send(new GetUserOrdersQuery(userId));
     }
 
     @GetMapping("/{orderId}")
-    public ResponseEntity<OrderListingDto> getOrderById(@PathVariable Integer orderId) {
-        return ResponseEntity.ok(orderApplicationService.getOrderById(orderId));
+    public OrderListingDto getOrderById(@PathVariable Integer orderId) {
+        return pipeline.send(new GetOrderByIdQuery(orderId));
     }
 
     @DeleteMapping("/{orderId}")
-    public ResponseEntity<Void> deleteOrder(@PathVariable Integer orderId) {
-        orderApplicationService.deleteOrder(orderId);
-        return ResponseEntity.ok().build();
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteOrder(@PathVariable Integer orderId) {
+        pipeline.send(new DeleteOrderCommand(orderId));
     }
 }
